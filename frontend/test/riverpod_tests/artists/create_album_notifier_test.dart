@@ -1,39 +1,55 @@
-// import 'package:flutter_test/flutter_test.dart';
-// import 'package:masinqo/infrastructure/auth/artist/artist_login_repository.dart';
-// import 'package:masinqo/infrastructure/auth/artist/artist_login_dto.dart';
-// import 'package:masinqo/infrastructure/auth/login_failure.dart';
-// import 'package:masinqo/infrastructure/auth/login_success.dart';
-// import 'package:mockito/mockito.dart';
-// import 'package:masinqo/infrastructure/auth/artist/artists_create_album_notifier.dart';
+import 'package:flutter_test/flutter_test.dart';
+import 'package:masinqo/application/artists/artists_events.dart';
+import 'package:masinqo/application/artists/artists_state.dart';
+import 'package:masinqo/domain/entities/albums.dart';
 
-// class MockArtistLoginRepository extends Mock implements ArtistLoginRepository {}
+void main() {
+  group('HomeAlbumUpdateEvent', () {
+    test('should take in albumId, title, genre, and description', () {
+      const event = HomeAlbumUpdateEvent(
+        albumId: '1',
+        title: 'Test Title',
+        genre: 'Test Genre',
+        description: 'Test Description',
+      );
 
-// void main() {
-//   ArtistsCreateAlbumNotifier notifier;
-//   MockArtistLoginRepository mockArtistLoginRepository;
+      expect(event.albumId, '1');
+      expect(event.title, 'Test Title');
+      expect(event.genre, 'Test Genre');
+      expect(event.description, 'Test Description');
+    });
+  });
 
-//   setUp(() {
-//     mockArtistLoginRepository = MockArtistLoginRepository();
-//     notifier = ArtistsCreateAlbumNotifier(mockArtistLoginRepository);
-//   });
+  group('CompletedEvent', () {
+    test('should take in errorState', () {
+      final errorState = ArtistHomeState(
+        name: 'Test Name',
+        email: 'Test Email',
+        profilePicture: 'Test Profile Picture',
+        albums: [],
+      );
+      final event = CompletedEvent(errorState: errorState);
 
-//   group('ArtistsCreateAlbumNotifier', () {
-//     test('should return success when album creation is successful', () async {
-//       when(mockArtistLoginRepository.createAlbum(any))
-//           .thenAnswer((_) async => Right(LoginSuccess()));
+      expect(event.errorState, errorState);
+    });
+  });
 
-//       await notifier.createAlbum(ArtistLoginDto());
+  group('CreateNewAlbum', () {
+    test('should take in album', () {
+      final album = Album(
+        id: '1',
+        title: 'Test Title',
+        albumArt: 'Test Album Art',
+        songs: [],
+        description: 'Test Description',
+        genre: 'Test Genre',
+        date: DateTime.now(),
+        artist: 'Test Artist',
+      );
 
-//       expect(notifier.state, equals(LoginSuccess()));
-//     });
+      final event = CreateNewAlbum(album: album);
 
-//     test('should return failure when album creation fails', () async {
-//       when(mockArtistLoginRepository.createAlbum(any))
-//           .thenAnswer((_) async => Left(LoginFailure()));
-
-//       await notifier.createAlbum(ArtistLoginDto());
-
-//       expect(notifier.state, equals(LoginFailure()));
-//     });
-//   });
-// }
+      expect(event.album, album);
+    });
+  });
+}

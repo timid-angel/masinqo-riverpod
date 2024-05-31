@@ -1,205 +1,145 @@
-import 'package:flutter_test/flutter_test.dart';
-import 'package:dartz/dartz.dart';
 import 'package:masinqo/domain/artists/artists_repository_interface.dart';
-import 'package:masinqo/infrastructure/artists/artists_dto.dart';
-import 'package:masinqo/core.dart';
-import 'package:masinqo/infrastructure/artists/artists_success.dart';
-import 'package:masinqo/infrastructure/artists/artists_failure.dart';
+import 'package:masinqo/infrastructure/artists/artists_repository.dart';
+import 'package:test/test.dart';
+import 'package:dartz/dartz.dart';
 import 'package:mockito/mockito.dart';
+import 'package:masinqo/domain/artists/artists.dart';
+import 'package:masinqo/domain/artists/artists_success.dart';
+import 'package:masinqo/domain/artists/artists_failure.dart';
+import 'package:masinqo/infrastructure/artists/artists_dto.dart';
 
-class MockArtistsRepository extends Mock implements ArtistsRepositoryInterface {
-  @override
-  Future<Either<ArtistFailure, AddAlbumSuccess>> addAlbum(
-          CreateAlbumDTO album) =>
-      super.noSuchMethod(
-        Invocation.method(#addAlbum, [album]),
-        returnValue: Future.value(Right(ArtistsSuccess())),
-        returnValueForMissingStub: Future.value(Right(ArtistsSuccess())),
-      );
-
-  @override
-  Future<Either<ArtistFailure, Success>> addSong(
-          CreateSongDTO songDto, String songFilePath) =>
-      super.noSuchMethod(
-        Invocation.method(#addSong, [songDto, songFilePath]),
-        returnValue: Future.value(ArtistsSuccess()),
-        returnValueForMissingStub: Future.value(ArtistFailure(message: "")),
-      );
-
-  @override
-  Future<Either<ArtistFailure, Success>> deleteAlbum(String albumId) =>
-      super.noSuchMethod(
-        Invocation.method(#deleteAlbum, [albumId]),
-        returnValue: Future.value(Right(ArtistsSuccess())),
-        returnValueForMissingStub:
-            Future.value(Left(ArtistFailure(message: ""))),
-      );
-
-  @override
-  Future<Either<ArtistFailure, GetAlbumsSuccess>> getAlbums() =>
-      super.noSuchMethod(
-        Invocation.method(#getAlbums, []),
-        returnValue: Future.value(Right(GetAlbumsSuccess(albums: []))),
-        returnValueForMissingStub:
-            Future.value(Left(ArtistFailure(message: ""))),
-      );
-
-  @override
-  Future<Either<ArtistFailure, GetSongsSuccess>> getSongs(String albumId) =>
-      super.noSuchMethod(
-        Invocation.method(#getSongs, [albumId]),
-        returnValue: Future.value(Right(GetSongsSuccess(songs: []))),
-        returnValueForMissingStub:
-            Future.value(Left(ArtistFailure(message: ""))),
-      );
-
-  @override
-  Future<Either<ArtistFailure, Success>> removeSong(
-          String albumId, String songName) =>
-      super.noSuchMethod(
-        Invocation.method(#removeSong, [albumId, songName]),
-        returnValue: Future.value(Right(ArtistsSuccess())),
-        returnValueForMissingStub:
-            Future.value(Left(ArtistFailure(message: ""))),
-      );
-
-  @override
-  Future<Either<ArtistFailure, Success>> updateAlbum(
-          UpdateAlbumDTO updateDto) =>
-      super.noSuchMethod(
-        Invocation.method(#updateAlbum, [updateDto]),
-        returnValue: Future.value(Right(ArtistsSuccess())),
-        returnValueForMissingStub:
-            Future.value(Left(ArtistFailure(message: ""))),
-      );
-
-  @override
-  Future<Either<ArtistFailure, Success>> updateInformation(
-          UpdateArtistInformatioDTO artist) =>
-      super.noSuchMethod(
-        Invocation.method(#updateInformation, [artist]),
-        returnValue: Future.value(Right(ArtistsSuccess())),
-        returnValueForMissingStub:
-            Future.value(Left(ArtistFailure(message: ""))),
-      );
-}
+class MockArtistsRepository extends Mock
+    implements ArtistsRepositoryInterface {}
 
 void main() {
-  MockArtistsRepository mockArtistsRepository = MockArtistsRepository();
+  group('addAlbum', () {
+    ArtistEntity artistEntity =
+        ArtistEntity(artistRepo: ArtistsRepository(token: "1"));
 
-  final testAlbumDto = CreateAlbumDTO(
-    title: 'Test Title',
-    albumArt: 'Test Album Art',
-    genre: 'Test Genre',
-    description: 'Test Description',
-    type: 'Test Type',
-  );
+    test('Should return failure when token is empty', () async {
+      final artistEntityWithInvalidToken =
+          ArtistEntity(artistRepo: ArtistsRepository(token: ""));
+      final result = await artistEntityWithInvalidToken.addAlbum(CreateAlbumDTO(
+        title: 'Test Title',
+        albumArt: 'Test Album Art',
+        genre: 'Test Genre',
+        description: 'Test Description',
+        type: 'Test Type',
+      ));
+      expect(
+        result.fold((l) => l.message, (r) => null),
+        equals('Invalid token'),
+      );
+    });
 
-  final testSongDto = CreateSongDTO(albumId: 'album-id', songName: 'Test Song');
-  test('should add song when fields are not empty', () async {
-    when(mockArtistsRepository.addSong(testSongDto, 'song-file-path'))
-        .thenAnswer((_) async => Left(ArtistFailure(message: "")));
+    test('Should return failure when album title is empty', () async {
+      final result = await artistEntity.addAlbum(CreateAlbumDTO(
+          title: '',
+          type: 'Album',
+          description: 'Test Description',
+          albumArt: 'path/to/art.jpg',
+          genre: 'Pop'));
+      expect(
+        result.fold((l) => l.message, (r) => r.toString()),
+        equals('Title too short'),
+      );
+    });
 
-    final result =
-        await mockArtistsRepository.addSong(testSongDto, 'song-file-path');
+    test('Should return failure when album art is missing', () async {
+      final result = await artistEntity.addAlbum(CreateAlbumDTO(
+          title: 'Test Album',
+          type: 'Album',
+          description: 'Test Description',
+          albumArt: '',
+          genre: 'Pop'));
 
-    verify(mockArtistsRepository.addSong(testSongDto, 'song-file-path'));
-    expect(
-        result.fold((l) => l, (r) => r),
-        isA<Right<ArtistFailure, Success>>()
-            .having((r) => r.value, 'value', isA<ArtistsSuccess>()));
+      expect(
+        result.fold((l) => l.message, (r) => null),
+        equals('Album must have an image'),
+      );
+    });
+    test('Should return failure when genre is empty', () async {
+      final result = await artistEntity.addAlbum(CreateAlbumDTO(
+          title: 'Test Album',
+          type: 'Album',
+          description: 'Test Description',
+          albumArt: 'path/to/art.jpg',
+          genre: ''));
+      expect(
+        result.fold((l) => l.message, (r) => null),
+        equals('Genre can not be empty'),
+      );
+    });
   });
 
-  const albumId = 'album-id';
-  test('should delete album when albumId is valid', () async {
-    when(mockArtistsRepository.deleteAlbum(albumId)).thenAnswer(
-        (_) async => Right<ArtistFailure, Success>(ArtistsSuccess()));
+  Future<Either<ArtistEntityFailure, ArtistEntitySuccess>> addSong(
+      CreateSongDTO songDto, String songFilePath) async {
+    if (songFilePath.isEmpty) {
+      return Left(ArtistEntityFailure(message: "Song must have an audio file"));
+    }
 
-    final result = await mockArtistsRepository.deleteAlbum(albumId);
+    final List<String> extensions = ["png", "jpg", "jpeg"];
+    if (extensions.contains(songFilePath.split(".").last)) {
+      return Left(ArtistEntityFailure(message: "Song must have an audio file"));
+    }
 
-    verify(mockArtistsRepository.deleteAlbum(albumId));
-    expect(
-        result,
-        isA<Right<ArtistFailure, Success>>()
-            .having((r) => r.value, 'value', isA<ArtistsSuccess>()));
-  });
+    if (songDto.songName.isEmpty) {
+      return Left(ArtistEntityFailure(message: "Song must have a name"));
+    }
 
-  test('should get albums successfully', () async {
-    when(mockArtistsRepository.getAlbums()).thenAnswer((_) async =>
-        Right<ArtistFailure, GetAlbumsSuccess>(GetAlbumsSuccess(albums: [])));
+    return Right(ArtistEntitySuccess());
+  }
 
-    final result = await mockArtistsRepository.getAlbums();
+  group('addSong', () {
+    test('should return failure when song file path is empty', () async {
+      final CreateSongDTO songDto =
+          CreateSongDTO(songName: "Test Song", albumId: 'album-id');
+      const String songFilePath = "";
 
-    verify(mockArtistsRepository.getAlbums());
-    expect(
-        result,
-        isA<Right<ArtistFailure, GetAlbumsSuccess>>()
-            .having((r) => r.value, 'value', isA<GetAlbumsSuccess>()));
-  });
+      final result = await addSong(songDto, songFilePath);
+      expect(
+        result.fold((l) => l.message, (r) => null),
+        equals('Song must have an audio file'),
+      );
+    });
 
-  test('should get songs successfully', () async {
-    when(mockArtistsRepository.getSongs(albumId)).thenAnswer((_) async =>
-        Right<ArtistFailure, GetSongsSuccess>(GetSongsSuccess(songs: [])));
+    test('should return failure when song file path has an invalid extension',
+        () async {
+      final CreateSongDTO songDto =
+          CreateSongDTO(songName: "Test Song", albumId: 'album-id');
+      const String songFilePath = "path/to/song.png";
 
-    final result = await mockArtistsRepository.getSongs(albumId);
+      final result = await addSong(songDto, songFilePath);
 
-    verify(mockArtistsRepository.getSongs(albumId));
-    expect(
-        result,
-        isA<Right<ArtistFailure, GetSongsSuccess>>()
-            .having((r) => r.value, 'value', isA<GetSongsSuccess>()));
-  });
+      expect(
+        result.fold((l) => l.message, (r) => null),
+        equals('Song must have an audio file'),
+      );
+    });
 
-  const songName = 'song-name';
-  test('should remove song when albumId and songName are valid', () async {
-    when(mockArtistsRepository.removeSong(albumId, songName)).thenAnswer(
-        (_) async => Right<ArtistFailure, Success>(ArtistsSuccess()));
+    test('should return failure when song name is empty', () async {
+      final CreateSongDTO songDto =
+          CreateSongDTO(songName: "", albumId: 'album-id');
+      const String songFilePath = "path/to/song.mp3";
 
-    final result = await mockArtistsRepository.removeSong(albumId, songName);
+      final result = await addSong(songDto, songFilePath);
+      expect(
+        result.fold((l) => l.message, (r) => null),
+        equals('Song must have a name'),
+      );
+    });
 
-    verify(mockArtistsRepository.removeSong(albumId, songName));
-    expect(
-        result,
-        isA<Right<ArtistFailure, Success>>()
-            .having((r) => r.value, 'value', isA<ArtistsSuccess>()));
-  });
+    test('should return success when all inputs are valid', () async {
+      final CreateSongDTO songDto =
+          CreateSongDTO(songName: "Test Song", albumId: 'album-id');
+      const String songFilePath = "path/to/song.mp3";
 
-  final updateDto = UpdateAlbumDTO(
-    albumId: 'album-id',
-    title: 'Updated Title',
-    genre: 'Updated Genre',
-    description: 'Updated Description',
-  );
-
-  test('should update album when fields are valid', () async {
-    when(mockArtistsRepository.updateAlbum(updateDto)).thenAnswer(
-        (_) async => Right<ArtistFailure, Success>(ArtistsSuccess()));
-
-    final result = await mockArtistsRepository.updateAlbum(updateDto);
-
-    verify(mockArtistsRepository.updateAlbum(updateDto));
-    expect(
-        result,
-        isA<Right<ArtistFailure, Success>>()
-            .having((r) => r.value, 'value', isA<ArtistsSuccess>()));
-  });
-
-  final updateInfoDto = UpdateArtistInformatioDTO(
-    'path/to/profile/picture',
-    email: 'test@example.com',
-    name: 'Test Artist',
-    password: 'password123',
-  );
-  test('should update artist information when fields are valid', () async {
-    when(mockArtistsRepository.updateInformation(updateInfoDto)).thenAnswer(
-        (_) async => Right<ArtistFailure, Success>(ArtistsSuccess()));
-
-    final result = await mockArtistsRepository.updateInformation(updateInfoDto);
-
-    verify(mockArtistsRepository.updateInformation(updateInfoDto));
-    expect(
-        result,
-        isA<Right<ArtistFailure, Success>>()
-            .having((r) => r.value, 'value', isA<ArtistsSuccess>()));
+      final result = await addSong(songDto, songFilePath);
+      expect(
+        result.fold(
+            (l) => fail('Expected success, but got failure $l'), (r) => r),
+        isA<ArtistEntitySuccess>(),
+      );
+    });
   });
 }

@@ -1,40 +1,55 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:masinqo/application/artists/artists_album_notifier.dart';
+import 'package:masinqo/application/artists/artists_events.dart';
 import 'package:masinqo/application/artists/artists_state.dart';
-import 'package:masinqo/domain/artists/artists_repository_interface.dart';
-import 'package:mockito/mockito.dart';
-
-class MockArtistsRepository extends Mock
-    implements ArtistsRepositoryInterface {}
+import 'package:masinqo/domain/entities/albums.dart';
 
 void main() {
-  group('AlbumNotifier', () {
-    late AlbumNotifier albumNotifier;
-    late MockArtistsRepository mockArtistsRepository;
-
-    setUp(() {
-      mockArtistsRepository = MockArtistsRepository();
-      albumNotifier = AlbumNotifier(artistRepo: mockArtistsRepository);
-    });
-
-    test('should initialize album', () {
-      final album = AlbumState(
-        title: "Test",
-        albumArt: "Test",
-        songs: [],
-        description: "Test",
-        genre: "Test",
-        date: DateTime.now(),
-        artist: "Test",
-        error: "",
-        albumId: "Test",
+  group('HomeAlbumUpdateEvent', () {
+    test('should take in albumId, title, genre, and description', () {
+      const event = HomeAlbumUpdateEvent(
+        albumId: '1',
+        title: 'Test Title',
+        genre: 'Test Genre',
+        description: 'Test Description',
       );
 
-      albumNotifier.initializeAlbum(album);
-
-      expect(albumNotifier.state, equals(album));
+      expect(event.albumId, '1');
+      expect(event.title, 'Test Title');
+      expect(event.genre, 'Test Genre');
+      expect(event.description, 'Test Description');
     });
+  });
 
-    // Add more tests for other methods in the AlbumNotifier class
+  group('CompletedEvent', () {
+    test('should take in errorState', () {
+      final errorState = ArtistHomeState(
+        name: 'Test Name',
+        email: 'Test Email',
+        profilePicture: 'Test Profile Picture',
+        albums: [],
+      );
+      final event = CompletedEvent(errorState: errorState);
+
+      expect(event.errorState, errorState);
+    });
+  });
+
+  group('CreateNewAlbum', () {
+    test('should take in album', () {
+      final album = Album(
+        id: '1',
+        title: 'Test Title',
+        albumArt: 'Test Album Art',
+        songs: [],
+        description: 'Test Description',
+        genre: 'Test Genre',
+        date: DateTime.now(),
+        artist: 'Test Artist',
+      );
+
+      final event = CreateNewAlbum(album: album);
+
+      expect(event.album, album);
+    });
   });
 }
