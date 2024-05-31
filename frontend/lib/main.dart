@@ -8,10 +8,15 @@ import 'package:masinqo/presentation/screens/artist_home.dart';
 import 'package:masinqo/presentation/screens/artist_profile.dart';
 import 'package:masinqo/presentation/screens/listener.dart';
 import 'package:masinqo/presentation/screens/listener_add_playlist.dart';
+import 'package:masinqo/presentation/screens/listener_album.dart';
+import 'package:masinqo/presentation/screens/listener_home.dart';
 import 'package:masinqo/presentation/screens/listener_library.dart';
+import 'package:masinqo/presentation/screens/listener_playlist.dart';
+import 'package:masinqo/presentation/screens/listener_profile.dart';
 import 'package:masinqo/presentation/screens/login.dart';
 import 'package:masinqo/presentation/screens/signup.dart';
 import 'package:go_router/go_router.dart';
+import 'package:masinqo/presentation/widgets/listener_drawer.dart';
 
 final _router = GoRouter(
   initialLocation: "/login",
@@ -51,36 +56,36 @@ final _router = GoRouter(
         return AdminHome(tk: state.pathParameters["tk"] as String);
       },
     ),
-    // GoRoute(
-    //   name: "listener_album",
-    //   path: '/listener/album',
-    //   builder: (context, state) {
-    //     final args = state.extra as AlbumNavigationArgument;
-    //     return AlbumWidget(
-    //       album: args.album,
-    //       token: args.token,
-    //     );
-    //   },
-    // ),
-    // GoRoute(
-    //   name: "listener_playlist",
-    //   path: '/listener/playlist',
-    //   builder: (context, state) {
-    //     final args = state.extra as PlaylistNavigationArgument;
-    //     return PlaylistWidget(
-    //       token: args.token,
-    //       playlist: args.playlist,
-    //     );
-    //   },
-    // ),
-    // GoRoute(
-    //   name: "listener_profile",
-    //   path: '/listener/profile',
-    //   builder: (context, state) {
-    //     final arg = state.extra as ProfileArgument;
-    //     return ListenerProfile(token: arg.token);
-    //   },
-    // ),
+    GoRoute(
+      name: "listener_album",
+      path: '/listener/album',
+      builder: (context, state) {
+        final args = state.extra as AlbumNavigationArgument;
+        return AlbumWidget(
+          album: args.album,
+          token: args.token,
+        );
+      },
+    ),
+    GoRoute(
+      name: "listener_playlist",
+      path: '/listener/playlist',
+      builder: (context, state) {
+        final args = state.extra as PlaylistNavigationArgument;
+        return PlaylistWidget(
+          token: args.token,
+          playlist: args.playlist,
+        );
+      },
+    ),
+    GoRoute(
+      name: "listener_profile",
+      path: '/listener/profile',
+      builder: (context, state) {
+        final arg = state.extra as ProfileArgument;
+        return ListenerProfile(token: arg.token);
+      },
+    ),
     GoRoute(
       name: "listener_new_playlist",
       path: '/listener/new_playlist',

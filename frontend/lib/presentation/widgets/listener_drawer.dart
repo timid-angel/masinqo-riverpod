@@ -1,8 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
-import 'package:masinqo/application/listener/listener_profile/profile_bloc.dart';
-import 'package:masinqo/application/listener/listener_profile/profile_events.dart';
 
 class ListenerDrawer extends StatelessWidget {
   final String token;
@@ -11,7 +8,7 @@ class ListenerDrawer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    context.read<ProfileBloc>().add(FetchProfile(token: token));
+    // context.read<ProfileBloc>().add(FetchProfile(token: token));
     return Drawer(
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 15),
@@ -57,8 +54,7 @@ class ListenerDrawer extends StatelessWidget {
                 ),
               ),
               onTap: () {
-                final args = ProfileArgument(
-                    token: token, profileBloc: context.read<ProfileBloc>());
+                final args = ProfileArgument(token: token);
                 context.pushNamed("listener_profile", extra: args);
               },
             ),
@@ -87,7 +83,6 @@ class ListenerDrawer extends StatelessWidget {
 
 class ProfileArgument {
   final String token;
-  final ProfileBloc profileBloc;
 
-  ProfileArgument({required this.token, required this.profileBloc});
+  ProfileArgument({required this.token});
 }

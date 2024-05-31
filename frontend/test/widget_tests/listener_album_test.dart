@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:masinqo/application/listener/listener_favorite/favorite_bloc.dart';
 import 'package:masinqo/domain/entities/albums.dart';
-import 'package:masinqo/domain/listener/listener_favorite.dart';
 import 'package:masinqo/presentation/screens/listener_album.dart';
 import 'package:masinqo/presentation/widgets/listener_album_albumart.dart';
 import 'package:masinqo/presentation/widgets/listener_album_headline.dart';
@@ -23,9 +21,6 @@ void main() {
               artist: "test_owner",
               id: ''),
           token: '',
-          favoriteBloc: FavoriteBloc(
-            favoriteRepository: ListenerFavCollection(),
-          ),
         ),
       ),
     );

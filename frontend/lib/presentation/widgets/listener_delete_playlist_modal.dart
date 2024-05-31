@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:masinqo/application/listener/listener_playlist/playlist_bloc.dart';
-import 'package:masinqo/application/listener/listener_playlist/playlist_events.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:masinqo/application/listener/listener_playlist/playlist_provider.dart';
 import 'package:masinqo/presentation/widgets/delete_confirmation_modal.dart';
 
-class DeletePlaylistModal extends StatelessWidget {
+class DeletePlaylistModal extends ConsumerWidget {
   final String token;
   final String id;
 
@@ -15,13 +14,11 @@ class DeletePlaylistModal extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return DeleteConfirmationDialog(
       title: 'Are you sure you want to delete this playlist?',
       onConfirm: () {
-        BlocProvider.of<PlaylistBloc>(context).add(
-          DeletePlaylists(token: token, id: id),
-        );
+        ref.read(playlistProvider.notifier).deletePlaylists(id, token);
         Navigator.of(context).pop();
       },
     );
