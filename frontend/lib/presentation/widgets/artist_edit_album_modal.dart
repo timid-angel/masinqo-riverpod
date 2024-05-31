@@ -1,31 +1,37 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:masinqo/application/artists/album/album_bloc.dart';
-import 'package:masinqo/application/artists/album/album_event.dart';
-import 'package:masinqo/application/artists/home_page/artist_home_bloc.dart';
-import 'package:masinqo/application/artists/home_page/artist_home_event.dart';
+import 'package:masinqo/application/artists/artists_provider.dart';
+import 'package:masinqo/application/auth/login/auth_providers.dart';
 import 'package:masinqo/presentation/core/theme/app_colors.dart';
 
-class EditSongModal extends StatelessWidget {
-  late final TextEditingController titleController;
-  late final TextEditingController genreController;
-  late final TextEditingController descriptionController;
-  final AlbumBloc albumBloc;
-  final ArtistHomeBloc artistHomeBloc;
+class EditSongModal extends ConsumerWidget {
+  late final TextEditingController titleController =
+      TextEditingController(text: "");
+  late final TextEditingController genreController =
+      TextEditingController(text: "");
+  late final TextEditingController descriptionController =
+      TextEditingController(text: "");
+  final String albumId;
 
   EditSongModal({
     super.key,
-    required this.albumBloc,
-    required this.artistHomeBloc,
-  }) {
-    titleController = TextEditingController(text: albumBloc.state.title);
-    genreController = TextEditingController(text: albumBloc.state.genre);
-    descriptionController =
-        TextEditingController(text: albumBloc.state.description);
-  }
+    required this.albumId,
+  });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final token = ref.read(artistLoginProvider).token;
+    final localProvider =
+        albumProvider(AlbumProviderParamters(token: token, albumId: albumId));
+    final state = ref.watch(localProvider);
+
+    if (titleController.text.isEmpty) {
+      titleController.text = state.title;
+      genreController.text = state.genre;
+      descriptionController.text = state.description;
+    }
+
     return Dialog(
       backgroundColor: Colors.black,
       shape: RoundedRectangleBorder(
@@ -119,19 +125,16 @@ class EditSongModal extends StatelessWidget {
               const SizedBox(height: 20.0),
               ElevatedButton(
                 onPressed: () {
-                  albumBloc.add(
-                    AlbumUpdateEvent(
-                      description: descriptionController.text,
-                      genre: genreController.text,
-                      title: titleController.text,
-                    ),
-                  );
-                  artistHomeBloc.add(HomeAlbumUpdateEvent(
-                    description: descriptionController.text,
-                    genre: genreController.text,
-                    title: titleController.text,
-                    albumId: albumBloc.state.albumId,
-                  ));
+                  ref.read(localProvider.notifier).updateAlbum(
+                      titleController.text,
+                      genreController.text,
+                      descriptionController.text);
+                  ref.read(homePageProvider(token).notifier).updateHomeAlbum(
+                      state.albumId,
+                      titleController.text,
+                      genreController.text,
+                      descriptionController.text);
+
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(
                       content: Text("Edited Album Successfully"),

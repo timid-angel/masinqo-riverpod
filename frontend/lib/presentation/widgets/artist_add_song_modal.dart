@@ -1,18 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:masinqo/application/artists/album/album_bloc.dart';
-import 'package:masinqo/application/artists/album/album_event.dart';
+import 'package:masinqo/application/artists/artists_provider.dart';
+import 'package:masinqo/application/auth/login/auth_providers.dart';
 
-class AddSongModal extends StatefulWidget {
-  final AlbumBloc albumBloc;
-  const AddSongModal({super.key, required this.albumBloc});
+class AddSongModal extends ConsumerStatefulWidget {
+  final String albumId;
+  const AddSongModal({super.key, required this.albumId});
 
   @override
   AddSongModalState createState() => AddSongModalState();
 }
 
-class AddSongModalState extends State<AddSongModal> {
+class AddSongModalState extends ConsumerState<AddSongModal> {
   late final TextEditingController _songNameController =
       TextEditingController();
   late String _filePath = '';
@@ -31,6 +32,10 @@ class AddSongModalState extends State<AddSongModal> {
 
   @override
   Widget build(BuildContext context) {
+    final token = ref.read(artistLoginProvider).token;
+    final localProvider = albumProvider(
+        AlbumProviderParamters(token: token, albumId: widget.albumId));
+
     return Dialog(
       backgroundColor: Colors.black,
       shape: RoundedRectangleBorder(
@@ -87,8 +92,7 @@ class AddSongModalState extends State<AddSongModal> {
               onPressed: () {
                 final String songName = _songNameController.text.trim();
                 if (songName.isNotEmpty && _filePath.isNotEmpty) {
-                  widget.albumBloc.add(AddSongEvent(
-                      songName: songName, songFilePath: _filePath));
+                  ref.read(localProvider.notifier).addSong(songName, _filePath);
                   context.pop();
                 } else {
                   ScaffoldMessenger.of(context).showSnackBar(

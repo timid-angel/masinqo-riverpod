@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:masinqo/application/artists/home_page/artist_home_bloc.dart';
 import 'package:masinqo/presentation/core/theme/app_theme_data.dart';
 import 'package:masinqo/presentation/screens/admin_home.dart';
 import 'package:masinqo/presentation/screens/admin_login.dart';
@@ -13,7 +12,6 @@ import 'package:masinqo/presentation/screens/listener_library.dart';
 import 'package:masinqo/presentation/screens/login.dart';
 import 'package:masinqo/presentation/screens/signup.dart';
 import 'package:go_router/go_router.dart';
-import 'package:masinqo/presentation/widgets/artist_album_card.dart';
 
 final _router = GoRouter(
   initialLocation: "/login",
@@ -96,7 +94,7 @@ final _router = GoRouter(
       name: "artist_profile",
       path: '/artist/profile',
       builder: (context, state) {
-        return ArtistProfile(artistHomeBloc: state.extra as ArtistHomeBloc);
+        return ArtistProfile(initialData: state.extra as Map<String, String>);
       },
     ),
     GoRoute(
@@ -104,7 +102,7 @@ final _router = GoRouter(
       path: '/artist/album',
       builder: (context, state) {
         return ArtistsAlbumPage(
-          blocTransferObject: state.extra as BlocTransferObject,
+          albumId: state.extra as String,
         );
       },
     ),
