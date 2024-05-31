@@ -1,18 +1,19 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:masinqo/application/admin/admin_event.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:masinqo/application/admin/admin_listener_notifier.dart';
 import 'package:masinqo/application/admin/admin_state.dart';
-import 'package:masinqo/application/admin/admin_bloc.dart';
-import 'package:masinqo/application/auth/admin_auth_bloc.dart';
 import 'package:masinqo/domain/admin/admin_listeners/admin_listeners.dart';
 import 'package:masinqo/presentation/widgets/admin_header.dart';
 import 'delete_confirmation_modal.dart';
 
-class AdminListenerMGT extends StatelessWidget {
-  const AdminListenerMGT({super.key});
+class AdminListenerMGT extends ConsumerWidget {
+  final StateNotifierProvider<AdminListenerNotifier, AdminListenersState>
+      provider;
+  const AdminListenerMGT({super.key, required this.provider});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final state = ref.watch(provider);
     return Scaffold(
       backgroundColor: Colors.transparent,
       body: Column(
@@ -30,10 +31,8 @@ class AdminListenerMGT extends StatelessWidget {
               ),
             ),
           ),
-          BlocBuilder<ListenerBloc, AdminListenersState>(
-            builder: (context, state) {
-              if (state.listeners.isEmpty) {
-                return Expanded(
+          state.listeners.isEmpty
+              ? Expanded(
                   child: Center(
                     child: Container(
                       decoration: const BoxDecoration(
@@ -44,25 +43,31 @@ class AdminListenerMGT extends StatelessWidget {
                       width: 400,
                     ),
                   ),
-                );
-              }
-
-              return Expanded(
-                  child: ListenerList(listenerData: state.listeners));
-            },
-          ),
+                )
+              : Expanded(
+                  child: ListenerList(
+                    listenerData: state.listeners,
+                    provider: provider,
+                  ),
+                ),
         ],
       ),
     );
   }
 }
 
-class ListenerList extends StatelessWidget {
+class ListenerList extends ConsumerWidget {
+  final StateNotifierProvider<AdminListenerNotifier, AdminListenersState>
+      provider;
   final List<AdminListener> listenerData;
-  const ListenerList({super.key, required this.listenerData});
+  const ListenerList({
+    super.key,
+    required this.listenerData,
+    required this.provider,
+  });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return ListView.builder(
       itemCount: listenerData.length,
       itemBuilder: (context, index) {
@@ -88,13 +93,7 @@ class ListenerList extends StatelessWidget {
                 icon: const Icon(Icons.delete),
                 onPressed: () {
                   void emitDeleteEvent() {
-                    BlocProvider.of<ListenerBloc>(context).add(
-                      DeleteListener(
-                        listenerId: listener.id,
-                        token:
-                            BlocProvider.of<AdminAuthBloc>(context).state.token,
-                      ),
-                    );
+                    ref.read(provider.notifier).deleteListener(listener.id);
                   }
 
                   showDialog(

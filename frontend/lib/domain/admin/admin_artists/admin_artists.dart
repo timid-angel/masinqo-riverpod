@@ -1,12 +1,12 @@
 import 'package:dartz/dartz.dart';
+import 'package:masinqo/domain/admin/admin_artists/admin_artists_repository_interface.dart';
 import 'package:masinqo/domain/admin/admin_failure.dart';
 import 'package:masinqo/domain/admin/admin_success.dart';
 import 'package:masinqo/infrastructure/admin/admin_artists/admin_artists_dto.dart';
-import 'package:masinqo/infrastructure/admin/admin_artists/admin_artists_repository.dart';
 
 class AdminArtistsCollection {
   late List<AdminArtist> listeners;
-  final AdminArtistsRepository adminArtistsRepository;
+  final AdminArtistRepositoryInterface adminArtistsRepository;
 
   AdminArtistsCollection({
     required this.adminArtistsRepository,

@@ -1,12 +1,12 @@
 import 'package:dartz/dartz.dart';
 import 'package:masinqo/domain/admin/admin_failure.dart';
+import 'package:masinqo/domain/admin/admin_listeners/admin_listeners_repository_interface.dart';
 import 'package:masinqo/domain/admin/admin_success.dart';
 import 'package:masinqo/infrastructure/admin/admin_listeners/admin_listener_dto.dart';
-import 'package:masinqo/infrastructure/admin/admin_listeners/admin_listeners_repository.dart';
 
 class AdminListenerCollection {
   late List<AdminListener> listeners;
-  final AdminListenersRepository adminListenersRepo;
+  final AdminListenerRepositoryInterface adminListenersRepo;
 
   AdminListenerCollection({required this.adminListenersRepo});
   Future<Either<AdminFailure, GetListenersSuccess>> getListeners() async {

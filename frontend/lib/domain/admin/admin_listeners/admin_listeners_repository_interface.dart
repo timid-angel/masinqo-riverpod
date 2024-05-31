@@ -4,6 +4,8 @@ import 'package:masinqo/infrastructure/admin/admin_listeners/admin_listener_fail
 import 'package:masinqo/infrastructure/admin/admin_listeners/admin_listeners_success.dart';
 
 abstract class AdminListenerRepositoryInterface {
+  get token => String;
+
   Future<Either<ListenerFetchFailure, ListenerFetchSuccess>> getListeners();
   Future<Either<ListenerDeleteFailure, ListenerDeleteSuccess>> deleteListener(
       ListenerID listener);

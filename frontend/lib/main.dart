@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:masinqo/application/artists/home_page/artist_home_bloc.dart';
-import 'package:masinqo/application/auth/listener_auth_bloc.dart';
-import 'package:masinqo/application/auth/artist_auth_bloc.dart';
 import 'package:masinqo/presentation/core/theme/app_theme_data.dart';
 import 'package:masinqo/presentation/screens/admin_home.dart';
 import 'package:masinqo/presentation/screens/admin_login.dart';
@@ -129,15 +128,7 @@ final _router = GoRouter(
 
 void main() {
   runApp(
-    MultiBlocProvider(
-      providers: [
-        BlocProvider<ListenerAuthBloc>(
-          create: (context) => ListenerAuthBloc(),
-        ),
-        BlocProvider<ArtistAuthBloc>(
-          create: (context) => ArtistAuthBloc(),
-        ),
-      ],
+    ProviderScope(
       child: MaterialApp.router(
           debugShowCheckedModeBanner: false,
           theme: AppThemeData.listnerTheme,

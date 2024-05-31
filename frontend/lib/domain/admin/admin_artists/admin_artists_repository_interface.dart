@@ -4,6 +4,8 @@ import 'package:masinqo/infrastructure/admin/admin_artists/admin_artists_failure
 import 'package:masinqo/infrastructure/admin/admin_artists/admin_artists_success.dart';
 
 abstract class AdminArtistRepositoryInterface {
+  get token => String;
+
   Future<Either<ArtistFetchFailure, ArtistFetchSuccess>> getArtists();
   Future<Either<ArtistDeleteFailure, ArtistDeleteSuccess>> deleteArtist(
       ArtistID artist);
