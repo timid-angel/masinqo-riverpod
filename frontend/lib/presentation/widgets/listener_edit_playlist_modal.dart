@@ -49,6 +49,7 @@ class EditPlaylistModal extends ConsumerWidget {
         ),
         ElevatedButton(
           onPressed: () {
+            playlistNotifier.editPlaylists(id, _newPlaylistName, token);
             playlistNotifier.fetchPlaylists(token);
             Navigator.pop(context, _newPlaylistName);
           },

@@ -1,17 +1,20 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:masinqo/application/listener/listener_playlist/playlist_provider.dart';
 import 'package:masinqo/presentation/core/theme/app_colors.dart';
 import 'package:masinqo/presentation/widgets/modal_button.dart';
 import 'package:masinqo/presentation/widgets/modal_heading.dart';
 import 'package:masinqo/presentation/widgets/modal_textfield.dart';
 
-class AddPlaylistWidget extends StatelessWidget {
+class AddPlaylistWidget extends ConsumerWidget {
   final String token;
   final TextEditingController nameController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
   AddPlaylistWidget({super.key, required this.token});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final playlistNotifier = ref.read(playlistProvider.notifier);
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.transparent,
@@ -59,14 +62,12 @@ class AddPlaylistWidget extends StatelessWidget {
                       children: [
                         ModalButtonWidget(
                           text: 'Create Playlist',
-                          onPressed: () {
+                          onPressed: () async {
                             if (_formKey.currentState!.validate()) {
-                              // BlocProvider.of<PlaylistBloc>(context).add(
-                              //   CreatePlaylists(
-                              //     token: token,
-                              //     name: nameController.text,
-                              //   ),
-                              // );
+                              await playlistNotifier.createPlaylists(
+                                nameController.text,
+                                token,
+                              );
                               ScaffoldMessenger.of(context).showSnackBar(
                                 const SnackBar(
                                   backgroundColor: Colors.green,
