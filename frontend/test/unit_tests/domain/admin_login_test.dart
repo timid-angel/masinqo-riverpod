@@ -31,8 +31,10 @@ class MockAdminEntity extends Mock implements AdminAuthEntity {
 void main() {
   group('AdminAuthEntity', () {
     test('returns LoginFailure when email is invalid', () async {
-      final authEntity =
-          AdminAuthEntity(email: 'invalid', password: 'password123');
+      final authEntity = AdminAuthEntity(
+          email: 'invalid',
+          password: 'password123',
+          adminLoginRepo: MockAdminLoginRepository());
 
       final result = await authEntity.loginAdmin();
 
@@ -41,8 +43,10 @@ void main() {
     });
 
     test('returns LoginFailure when password is too short', () async {
-      final authEntity =
-          AdminAuthEntity(email: 'test@example.com', password: '123');
+      final authEntity = AdminAuthEntity(
+          email: 'test@example.com',
+          password: '123',
+          adminLoginRepo: MockAdminLoginRepository());
 
       final result = await authEntity.loginAdmin();
 
