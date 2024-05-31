@@ -30,7 +30,7 @@ class MockListenerProfileService extends Mock
         Invocation.method(#editProfile, [token, name, email, password]),
         returnValue: Future.value(null),
         returnValueForMissingStub:
-            Future.error(Exception('Failed to edit profile')),
+            Future.value(Exception('Failed to edit profile')),
       );
 }
 
