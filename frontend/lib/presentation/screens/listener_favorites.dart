@@ -1,13 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:masinqo/application/listener/listener_favorite/favorite_bloc.dart';
-import 'package:masinqo/application/listener/listener_favorite/favorite_events.dart';
+import 'package:masinqo/application/listener/listener_favorite/favorite_provider.dart';
 import 'package:masinqo/application/listener/listener_favorite/favorite_state.dart';
 import 'package:masinqo/presentation/screens/listener_home.dart';
 import 'package:masinqo/presentation/widgets/listener_favorite_album.dart';
 
-class ListenerFavorites extends StatelessWidget {
+class ListenerFavorites extends ConsumerWidget {
   const ListenerFavorites({
     super.key,
     required this.token,
@@ -17,8 +16,12 @@ class ListenerFavorites extends StatelessWidget {
   // final List<Album> favorites;
 
   @override
-  Widget build(BuildContext context) {
-    BlocProvider.of<FavoriteBloc>(context).add(FetchFavorites(token: token));
+  Widget build(BuildContext context, WidgetRef ref) {
+    // BlocProvider.of<FavoriteBloc>(context).add(FetchFavorites(token: token));
+    final favNotifier = ref.read(favoriteProvider.notifier);
+    final favState = ref.watch(favoriteProvider);
+
+    favNotifier.fetchFavorites(token);
     return SafeArea(
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 2),
@@ -33,43 +36,37 @@ class ListenerFavorites extends StatelessWidget {
               ),
             ),
             Expanded(
-              child: BlocBuilder<FavoriteBloc, FavoriteState>(
-                builder: (context, state) {
-                  if (state is EmptyFavorite) {
-                    return const Center(child: Text('No Favorites available'));
-                  } else if (state is LoadedFavorite) {
-                    return GridView.count(
-                      crossAxisCount: 2,
-                      mainAxisSpacing: 20,
-                      crossAxisSpacing: 20,
-                      childAspectRatio: 0.68,
-                      children: state.favorites
-                          .map(
-                            (a) => GestureDetector(
-                              onTap: () {
-                                final arguments = AlbumNavigationArgument(
-                                  token: token,
-                                  album: a,
-                                  favoriteBloc:
-                                      BlocProvider.of<FavoriteBloc>(context),
-                                );
-                                context.pushNamed("listener_album",
-                                    extra: arguments);
-                              },
-                              child: ListenerFavoriteAlbumCard(album: a),
+              child: favState is EmptyFavorite
+                  ? const Center(child: Text('No Favorites available'))
+                  : favState is LoadedFavorite
+                      ? GridView.count(
+                          crossAxisCount: 2,
+                          mainAxisSpacing: 20,
+                          crossAxisSpacing: 20,
+                          childAspectRatio: 0.68,
+                          children: favState.favorites
+                              .map(
+                                (a) => GestureDetector(
+                                  onTap: () {
+                                    final arguments = AlbumNavigationArgument(
+                                      token: token,
+                                      album: a,
+                                    );
+                                    context.pushNamed("listener_album",
+                                        extra: arguments);
+                                  },
+                                  child: ListenerFavoriteAlbumCard(album: a),
+                                ),
+                              )
+                              .toList(),
+                        )
+                      : favState is ErrorFavorite
+                          ? Center(
+                              child: Text(
+                                  'Failed to load Favorites: ${favState.error}'))
+                          : const Center(
+                              child: CircularProgressIndicator(),
                             ),
-                          )
-                          .toList(),
-                    );
-                  } else if (state is ErrorFavorite) {
-                    return Center(
-                        child:
-                            Text('Failed to load Favorites: ${state.error}'));
-                  } else {
-                    return const Center(child: CircularProgressIndicator());
-                  }
-                },
-              ),
             ),
           ],
         ),
