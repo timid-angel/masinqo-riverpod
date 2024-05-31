@@ -66,8 +66,7 @@ class _AlbumWidgetState extends State<AlbumWidget> {
                       deviceWidth: deviceWidth,
                       albumArt: widget.album.albumArt),
                   Container(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 25, vertical: 0),
+                    padding: const EdgeInsets.symmetric(horizontal: 25),
                     child: Column(
                       children: [
                         AlbumHeadlineWidget(

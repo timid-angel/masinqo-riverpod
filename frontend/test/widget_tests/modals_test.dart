@@ -1,4 +1,7 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:masinqo/presentation/widgets/artist_add_song_modal.dart';
 import 'package:masinqo/presentation/widgets/artist_create_album_modal.dart';
@@ -6,13 +9,17 @@ import 'package:masinqo/presentation/widgets/artist_edit_album_modal.dart';
 import 'package:masinqo/presentation/widgets/delete_confirmation_modal.dart';
 import 'package:masinqo/presentation/widgets/modal_heading.dart';
 
+import 'http_override.dart';
+
 void main() {
   group("Modals Test", () {
     testWidgets("Add Song Modal Test", (tester) async {
       await tester.pumpWidget(
-        const MaterialApp(
-          home: AddSongModal(
-            albumId: '',
+        const ProviderScope(
+          child: MaterialApp(
+            home: AddSongModal(
+              albumId: '',
+            ),
           ),
         ),
       );
@@ -32,10 +39,12 @@ void main() {
   });
 
   testWidgets("Create Album Modal Test", (tester) async {
-    await tester.pumpWidget(const MaterialApp(
-        home: CreateAlbumModal(
-      token: "",
-    )));
+    await tester.pumpWidget(const ProviderScope(
+      child: MaterialApp(
+          home: CreateAlbumModal(
+        token: "",
+      )),
+    ));
 
     final titleFinder = find.text("Create Album");
     final hint1TextFinder = find.text("Album name");
@@ -53,10 +62,13 @@ void main() {
   });
 
   testWidgets("Edit Song Modal Test", (tester) async {
+    HttpOverrides.global = MyHttpOverrides();
     await tester.pumpWidget(
-      MaterialApp(
-        home: EditSongModal(
-          albumId: '',
+      ProviderScope(
+        child: MaterialApp(
+          home: EditSongModal(
+            albumId: '',
+          ),
         ),
       ),
     );

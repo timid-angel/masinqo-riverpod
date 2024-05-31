@@ -1,12 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:masinqo/presentation/core/theme/app_colors.dart';
 import 'package:masinqo/presentation/screens/signup.dart';
 
 void main() {
   testWidgets("Main Signup Page Test", (tester) async {
-    await tester.pumpWidget(MaterialApp(
-      home: Scaffold(body: SignupWidget()),
+    await tester.pumpWidget(ProviderScope(
+      child: MaterialApp(
+        home: Scaffold(body: SignupWidget()),
+      ),
     ));
 
     final signupArtistBtn = find.text('Artist Signup');

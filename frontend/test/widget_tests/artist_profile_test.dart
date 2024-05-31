@@ -1,15 +1,23 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:masinqo/presentation/screens/artist_profile.dart';
 import 'package:masinqo/presentation/widgets/profile_mgmt_section_title.dart';
 
+import 'http_override.dart';
+
 void main() {
   group('Artist Profile Test', () {
     testWidgets('Artist Profile UI', (tester) async {
+      HttpOverrides.global = MyHttpOverrides();
       await tester.pumpWidget(
-        const MaterialApp(
-          home: ArtistProfile(
-            initialData: {"name": "test_initial", "email": "test_initial"},
+        const ProviderScope(
+          child: MaterialApp(
+            home: ArtistProfile(
+              initialData: {"name": "test_initial", "email": "test_initial"},
+            ),
           ),
         ),
       );

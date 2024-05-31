@@ -1,13 +1,21 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:masinqo/presentation/screens/login.dart';
 import 'package:masinqo/presentation/widgets/background.dart';
 import 'package:masinqo/presentation/widgets/login_options.dart';
 
+import 'http_override.dart';
+
 void main() {
   testWidgets("Main Login Page Test", (tester) async {
-    await tester.pumpWidget(MaterialApp(
-      home: Scaffold(body: LoginWidget()),
+    HttpOverrides.global = MyHttpOverrides();
+    await tester.pumpWidget(ProviderScope(
+      child: MaterialApp(
+        home: Scaffold(body: LoginWidget()),
+      ),
     ));
 
     final loginArtistBtn = find.text('Login as Artist');
