@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:masinqo/application/artists/album/album_state.dart';
-import 'package:masinqo/application/artists/home_page/artist_home_bloc.dart';
+import 'package:masinqo/application/artists/artists_state.dart';
 import 'package:masinqo/presentation/widgets/artist_album_card.dart';
 
 void main() {
@@ -20,8 +19,6 @@ void main() {
                 artist: '',
                 error: '',
                 albumId: ''),
-            token: '',
-            artistHomeBloc: ArtistHomeBloc(token: ""),
           ),
         ),
       ),

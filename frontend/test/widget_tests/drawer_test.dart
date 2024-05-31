@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:masinqo/application/artists/home_page/artist_home_bloc.dart';
 import 'package:masinqo/presentation/widgets/artist_drawer.dart';
 import 'package:masinqo/presentation/widgets/listener_drawer.dart';
 
@@ -8,11 +7,8 @@ void main() {
   group("Drawers Test", () {
     testWidgets("Artist Drawer Test", (tester) async {
       await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-              body: ArtistDrawer(
-            artistHomeBloc: ArtistHomeBloc(token: ""),
-          )),
+        const MaterialApp(
+          home: Scaffold(body: ArtistDrawer()),
         ),
       );
 

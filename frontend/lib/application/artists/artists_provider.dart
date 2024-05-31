@@ -18,7 +18,7 @@ final homePageProvider = StateNotifierProvider.family<ArtistsHomePageNotifier,
 });
 
 final createAlbumProvider =
-    StateNotifierProvider.family<CreateAlbumNotifier, AlbumInitial, String>(
+    StateNotifierProvider.family<CreateAlbumNotifier, ArtistAlbumState, String>(
         (ref, token) {
   return CreateAlbumNotifier(artistRepo: ArtistsRepository(token: token));
 });
