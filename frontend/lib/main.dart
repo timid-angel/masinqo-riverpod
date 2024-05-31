@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:masinqo/application/artists/home_page/artist_home_bloc.dart';
 import 'package:masinqo/presentation/core/theme/app_theme_data.dart';
@@ -67,7 +66,6 @@ final _router = GoRouter(
         return AlbumWidget(
           album: args.album,
           token: args.token,
-          favoriteBloc: args.favoriteBloc,
         );
       },
     ),
@@ -77,13 +75,9 @@ final _router = GoRouter(
       builder: (context, state) {
         final args = state.extra as PlaylistNavigationArgument;
 
-        return BlocProvider.value(
-          value: args.playlistBloc,
-          child: PlaylistWidget(
-            bloc: args.playlistBloc,
-            token: args.token,
-            playlist: args.playlist,
-          ),
+        return PlaylistWidget(
+          token: args.token,
+          playlist: args.playlist,
         );
       },
     ),
@@ -92,7 +86,7 @@ final _router = GoRouter(
       path: '/listener/profile',
       builder: (context, state) {
         final arg = state.extra as ProfileArgument;
-        return ListenerProfile(token: arg.token, profileBloc: arg.profileBloc);
+        return ListenerProfile(token: arg.token);
       },
     ),
     GoRoute(
@@ -101,10 +95,7 @@ final _router = GoRouter(
       builder: (context, state) {
         final args = state.extra as PlaylistNavigationExtras;
 
-        return BlocProvider.value(
-          value: args.playlistBloc,
-          child: AddPlaylistWidget(token: args.token),
-        );
+        return AddPlaylistWidget(token: args.token);
       },
     ),
     GoRoute(
