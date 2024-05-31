@@ -1,19 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:masinqo/application/admin/admin_listener_notifier.dart';
-import 'package:masinqo/application/admin/admin_state.dart';
+import 'package:masinqo/application/admin/admin_providers.dart';
+import 'package:masinqo/application/auth/auth_providers.dart';
 import 'package:masinqo/domain/admin/admin_listeners/admin_listeners.dart';
 import 'package:masinqo/presentation/widgets/admin_header.dart';
 import 'delete_confirmation_modal.dart';
 
 class AdminListenerMGT extends ConsumerWidget {
-  final StateNotifierProvider<AdminListenerNotifier, AdminListenersState>
-      provider;
-  const AdminListenerMGT({super.key, required this.provider});
+  const AdminListenerMGT({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final state = ref.watch(provider);
+    final tk = ref.read(adminLoginProvider).token;
+    final state = ref.watch(listenerProvider(tk));
     return Scaffold(
       backgroundColor: Colors.transparent,
       body: Column(
@@ -45,10 +44,7 @@ class AdminListenerMGT extends ConsumerWidget {
                   ),
                 )
               : Expanded(
-                  child: ListenerList(
-                    listenerData: state.listeners,
-                    provider: provider,
-                  ),
+                  child: ListenerList(listenerData: state.listeners),
                 ),
         ],
       ),
@@ -57,17 +53,16 @@ class AdminListenerMGT extends ConsumerWidget {
 }
 
 class ListenerList extends ConsumerWidget {
-  final StateNotifierProvider<AdminListenerNotifier, AdminListenersState>
-      provider;
   final List<AdminListener> listenerData;
   const ListenerList({
     super.key,
     required this.listenerData,
-    required this.provider,
   });
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final tk = ref.read(adminLoginProvider).token;
+    final provider = listenerProvider(tk);
     return ListView.builder(
       itemCount: listenerData.length,
       itemBuilder: (context, index) {

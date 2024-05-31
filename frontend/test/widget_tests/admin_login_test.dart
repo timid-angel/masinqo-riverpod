@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:masinqo/application/auth/admin_auth_bloc.dart';
-import 'package:masinqo/application/auth/login_form/admin_login/admin_login_bloc.dart';
+import 'package:masinqo/application/auth/admin_login/admin_login_bloc.dart';
 import 'package:masinqo/infrastructure/auth/admin/admin_login_repository.dart';
 import 'package:masinqo/presentation/screens/admin_login.dart';
 import 'package:masinqo/presentation/widgets/admin_login_button.dart';

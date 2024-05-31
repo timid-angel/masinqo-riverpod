@@ -15,11 +15,9 @@ class ListenerPlaylistService {
     final response = await http.get(Uri.parse('$baseUrl/playlists'), headers: {
       "Cookie": token,
     });
-    print("plalist service${response.body}");
 
     if (response.statusCode == 200) {
       Iterable lists = json.decode(response.body);
-      print(lists);
       return List<Playlist>.from(
           lists.map((model) => Playlist.fromJson(model)));
     } else {

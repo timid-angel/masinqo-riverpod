@@ -1,13 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:masinqo/application/auth/auth_event.dart';
-import 'package:masinqo/application/auth/login_page_bloc.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:masinqo/application/auth/auth_providers.dart';
 
-class LoginOptionButton extends StatelessWidget {
+class LoginOptionButton extends ConsumerWidget {
   final bool isArtist;
   final Color primaryColor;
   final String buttonText;
   final bool toValue;
-  final LoginPageBloc loginBloc;
 
   const LoginOptionButton({
     super.key,
@@ -15,14 +14,13 @@ class LoginOptionButton extends StatelessWidget {
     required this.primaryColor,
     required this.buttonText,
     required this.toValue,
-    required this.loginBloc,
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return TextButton(
       onPressed: () {
-        loginBloc.add(SwitchRole(toValue: toValue));
+        ref.read(loginPageProvider.notifier).switchState(toValue);
       },
       style: ButtonStyle(
         backgroundColor: WidgetStateProperty.all(Colors.transparent),

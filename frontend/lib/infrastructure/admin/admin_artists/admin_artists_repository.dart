@@ -9,6 +9,7 @@ import 'package:masinqo/infrastructure/admin/admin_artists/admin_artists_failure
 import 'package:masinqo/infrastructure/admin/admin_artists/admin_artists_success.dart';
 
 class AdminArtistsRepository implements AdminArtistRepositoryInterface {
+  @override
   final String? token;
 
   AdminArtistsRepository({required this.token});

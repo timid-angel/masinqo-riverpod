@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:masinqo/application/admin/admin_providers.dart';
 import 'package:masinqo/presentation/widgets/admin_artist_mgt.dart';
 import 'package:masinqo/presentation/widgets/admin_listener_mgt.dart';
 import 'package:masinqo/presentation/widgets/admin_tabs.dart';
@@ -12,12 +11,10 @@ class AdminHome extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final artistsProvider = artistProvider(tk);
-    final listenersProvider = listenerProvider(tk);
     return ConstrainedBox(
       constraints:
           BoxConstraints(maxHeight: MediaQuery.of(context).size.height),
-      child: BackgroundGradient(
+      child: const BackgroundGradient(
         child: DefaultTabController(
           length: 2,
           child: Scaffold(
@@ -25,16 +22,12 @@ class AdminHome extends ConsumerWidget {
             body: SafeArea(
               child: TabBarView(
                 children: [
-                  AdminArtistMGT(
-                    provider: artistsProvider,
-                  ),
-                  AdminListenerMGT(
-                    provider: listenersProvider,
-                  ),
+                  AdminArtistMGT(),
+                  AdminListenerMGT(),
                 ],
               ),
             ),
-            bottomNavigationBar: const BottomAppBar(
+            bottomNavigationBar: BottomAppBar(
               color: Colors.transparent,
               height: 55,
               child: AdminTabs(),

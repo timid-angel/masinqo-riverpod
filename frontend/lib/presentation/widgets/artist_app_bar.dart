@@ -38,7 +38,7 @@ class ArtistAppBar extends StatelessWidget implements PreferredSizeWidget {
             color: Colors.white,
           ),
           onPressed: () {
-            context.pushReplacementNamed("artist");
+            // context.go("artist");
           },
         ),
         IconButton(

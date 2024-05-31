@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:masinqo/application/admin/admin_artist_notifier.dart';
-import 'package:masinqo/application/admin/admin_state.dart';
+import 'package:masinqo/application/admin/admin_providers.dart';
+import 'package:masinqo/application/auth/auth_providers.dart';
 import 'package:masinqo/domain/admin/admin_artists/admin_artists.dart';
 import 'package:masinqo/infrastructure/core/url.dart';
 import 'package:masinqo/presentation/widgets/admin_empty_list.dart';
@@ -9,12 +9,12 @@ import 'package:masinqo/presentation/widgets/admin_header.dart';
 import 'package:masinqo/presentation/widgets/delete_confirmation_modal.dart';
 
 class AdminArtistMGT extends ConsumerWidget {
-  final StateNotifierProvider<AdminArtistNotifier, AdminArtistsState> provider;
-  const AdminArtistMGT({super.key, required this.provider});
+  const AdminArtistMGT({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final state = ref.watch(provider);
+    final tk = ref.read(adminLoginProvider).token;
+    final state = ref.watch(artistProvider(tk));
     return Scaffold(
       backgroundColor: Colors.transparent,
       body: Column(
@@ -37,7 +37,6 @@ class AdminArtistMGT extends ConsumerWidget {
               : Expanded(
                   child: ArtistList(
                     artistData: state.artists,
-                    provider: provider,
                   ),
                 ),
         ],
@@ -47,13 +46,13 @@ class AdminArtistMGT extends ConsumerWidget {
 }
 
 class ArtistList extends ConsumerWidget {
-  final StateNotifierProvider<AdminArtistNotifier, AdminArtistsState> provider;
   final List<AdminArtist> artistData;
-  const ArtistList(
-      {super.key, required this.artistData, required this.provider});
+  const ArtistList({super.key, required this.artistData});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final tk = ref.read(adminLoginProvider).token;
+    final provider = artistProvider(tk);
     return ListView.builder(
       itemCount: artistData.length,
       itemBuilder: (context, index) {

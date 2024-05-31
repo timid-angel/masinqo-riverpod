@@ -11,6 +11,7 @@ import 'package:masinqo/infrastructure/core/url.dart';
 
 class AdminListenersRepository implements AdminListenerRepositoryInterface {
   final String url = Domain.url;
+  @override
   final String? token;
 
   AdminListenersRepository({required this.token});

@@ -54,7 +54,7 @@ final _router = GoRouter(
     ),
     GoRoute(
       name: "admin_home",
-      path: '/admin_home/:tk',
+      path: '/admin_home:tk',
       builder: (context, state) {
         return AdminHome(tk: state.pathParameters["tk"] as String);
       },

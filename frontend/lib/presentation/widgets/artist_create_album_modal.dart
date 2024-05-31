@@ -8,8 +8,6 @@ import 'package:masinqo/application/artists/create_album/create_albums_event.dar
 import 'package:masinqo/application/artists/create_album/create_albums_state.dart';
 import 'package:masinqo/application/artists/home_page/artist_home_bloc.dart';
 import 'package:masinqo/application/artists/home_page/artist_home_event.dart';
-import 'package:masinqo/application/auth/artist_auth_bloc.dart';
-import 'package:masinqo/application/auth/auth_state.dart';
 
 class CreateAlbumModal extends StatelessWidget {
   final String token;
@@ -19,15 +17,11 @@ class CreateAlbumModal extends StatelessWidget {
       {super.key, required this.token, required this.artistHomeBloc});
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<ArtistAuthBloc, ArtistAuthState>(
-      builder: (context, authState) {
-        return BlocProvider(
-          create: (context) => AlbumBloc(token: token),
-          child: _CreateAlbumModalContent(
-            artistHomeBloc: artistHomeBloc,
-          ),
-        );
-      },
+    return BlocProvider(
+      create: (context) => AlbumBloc(token: token),
+      child: _CreateAlbumModalContent(
+        artistHomeBloc: artistHomeBloc,
+      ),
     );
   }
 }
