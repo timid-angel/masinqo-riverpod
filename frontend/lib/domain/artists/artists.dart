@@ -1,19 +1,18 @@
 import 'package:dartz/dartz.dart';
 import 'package:email_validator/email_validator.dart';
-import 'package:masinqo/application/artists/album/album_state.dart';
+import 'package:masinqo/application/artists/artists_state.dart';
 import 'package:masinqo/domain/artists/artists_failure.dart';
+import 'package:masinqo/domain/artists/artists_repository_interface.dart';
 import 'package:masinqo/domain/artists/artists_success.dart';
 import 'package:masinqo/infrastructure/artists/artists_dto.dart';
-import 'package:masinqo/infrastructure/artists/artists_repository.dart';
 
 class ArtistEntity {
-  final String token;
-
-  ArtistEntity({required this.token});
+  final ArtistsRepositoryInterface artistRepo;
+  ArtistEntity({required this.artistRepo});
 
   Future<Either<ArtistEntityFailure, GetArtistInformationSuccess>>
       getArtistInformation() async {
-    final res = await ArtistsRepository(token: token).getArtistInformation();
+    final res = await artistRepo.getArtistInformation();
 
     return res.fold((l) {
       return Left(ArtistEntityFailure(message: l.message));
@@ -24,7 +23,7 @@ class ArtistEntity {
 
   Future<Either<ArtistEntityFailure, AddAlbumSuccessD>> addAlbum(
       CreateAlbumDTO albumDto) async {
-    if (token.isEmpty) {
+    if (artistRepo.token.isEmpty) {
       return Left(ArtistEntityFailure(message: "Invalid token"));
     }
 
@@ -40,7 +39,7 @@ class ArtistEntity {
       return Left(ArtistEntityFailure(message: "Genre can not be empty"));
     }
 
-    final res = await ArtistsRepository(token: token).addAlbum(albumDto);
+    final res = await artistRepo.addAlbum(albumDto);
     return res.fold((l) {
       return Left(ArtistEntityFailure(message: l.message));
     }, (r) {
@@ -69,8 +68,7 @@ class ArtistEntity {
       }
     }
 
-    final res =
-        await ArtistsRepository(token: token).addSong(songDto, songFilePath);
+    final res = await artistRepo.addSong(songDto, songFilePath);
 
     return res.fold((l) {
       return Left(ArtistEntityFailure(message: l.message));
@@ -81,7 +79,7 @@ class ArtistEntity {
 
   Future<Either<ArtistEntityFailure, ArtistGetAlbumsSuccess>>
       getAlbums() async {
-    final res = await ArtistsRepository(token: token).getAlbums();
+    final res = await artistRepo.getAlbums();
 
     return res.fold(
       (l) {
@@ -95,7 +93,7 @@ class ArtistEntity {
 
   Future<Either<ArtistEntityFailure, ArtistGetSongsSuccess>> getSongs(
       String albumId) async {
-    final res = await ArtistsRepository(token: token).getSongs(albumId);
+    final res = await artistRepo.getSongs(albumId);
 
     return res.fold(
       (l) {
@@ -109,8 +107,7 @@ class ArtistEntity {
 
   Future<Either<ArtistEntityFailure, ArtistEntitySuccess>> removeSong(
       String albumId, String songName) async {
-    final res =
-        await ArtistsRepository(token: token).removeSong(albumId, songName);
+    final res = await artistRepo.removeSong(albumId, songName);
 
     return res.fold(
       (l) {
@@ -124,7 +121,7 @@ class ArtistEntity {
 
   Future<Either<ArtistEntityFailure, ArtistEntitySuccess>> removeAlbum(
       String albumId) async {
-    final res = await ArtistsRepository(token: token).deleteAlbum(albumId);
+    final res = await artistRepo.deleteAlbum(albumId);
 
     return res.fold(
       (l) {
@@ -138,7 +135,7 @@ class ArtistEntity {
 
   Future<Either<ArtistEntityFailure, ArtistEntitySuccess>> updateAlbum(
       UpdateAlbumDTO updateDto) async {
-    final res = await ArtistsRepository(token: token).updateAlbum(updateDto);
+    final res = await artistRepo.updateAlbum(updateDto);
 
     return res.fold(
       (l) {
@@ -171,7 +168,7 @@ class ArtistEntity {
       return Left(ArtistEntityFailure(message: "Passwords don't match"));
     }
 
-    final res = await ArtistsRepository(token: token).updateInformation(artist);
+    final res = await artistRepo.updateInformation(artist);
 
     return res.fold(
       (l) {

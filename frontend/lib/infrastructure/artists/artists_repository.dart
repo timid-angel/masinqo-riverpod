@@ -11,6 +11,7 @@ import 'package:masinqo/infrastructure/artists/artists_failure.dart';
 import 'package:masinqo/infrastructure/artists/artists_success.dart';
 
 class ArtistsRepository implements ArtistsRepositoryInterface {
+  @override
   final String token;
   ArtistsRepository({required this.token});
 
