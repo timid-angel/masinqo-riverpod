@@ -3,24 +3,23 @@ import 'package:mockito/annotations.dart';
 import 'package:dartz/dartz.dart';
 import 'package:mockito/mockito.dart';
 import 'package:masinqo/infrastructure/auth/login_success.dart';
-import 'artist_login_test.mocks.dart';
-import 'package:masinqo/infrastructure/auth/artist/artist_login_dto.dart';
+import 'admin_login_test.mocks.dart';
 import 'package:masinqo/domain/auth/login/login_entities.dart';
-import 'package:masinqo/infrastructure/auth/artist/artist_login_repository.dart';
+import 'package:masinqo/infrastructure/auth/admin/admin_login_repository.dart';
 import 'package:masinqo/domain/auth/login/login_failure.dart';
 import 'package:masinqo/domain/auth/login/login_success.dart';
 
-@GenerateMocks([ArtistLoginRepository])
-class MockArtistEntity extends Mock implements ArtistAuthEntity {
-  MockArtistEntity(
+@GenerateMocks([AdminLoginRepository])
+class MockAdminEntity extends Mock implements AdminAuthEntity {
+  MockAdminEntity(
       {required String email,
       required String password,
-      required ArtistLoginRepository repository});
+      required AdminLoginRepository repository});
 
   @override
-  Future<Either<LoginFailure, LoginSuccess>> loginArtist() {
+  Future<Either<LoginFailure, LoginSuccess>> loginAdmin() {
     return super.noSuchMethod(
-      Invocation.method(#signupArtist, []),
+      Invocation.method(#signupAdmin, []),
       returnValue:
           Future.value(Left<LoginFailure, LoginSuccess>(LoginFailure())),
       returnValueForMissingStub: Future.value(Right<LoginFailure, LoginSuccess>(
@@ -30,12 +29,12 @@ class MockArtistEntity extends Mock implements ArtistAuthEntity {
 }
 
 void main() {
-  group('ArtistAuthEntity', () {
+  group('AdminAuthEntity', () {
     test('returns LoginFailure when email is invalid', () async {
       final authEntity =
-          ArtistAuthEntity(email: 'invalid', password: 'password123');
+          AdminAuthEntity(email: 'invalid', password: 'password123');
 
-      final result = await authEntity.loginArtist();
+      final result = await authEntity.loginAdmin();
 
       expect(result.isLeft(), true);
       expect(result.fold((l) => l, (r) => null), isA<LoginFailure>());
@@ -43,28 +42,24 @@ void main() {
 
     test('returns LoginFailure when password is too short', () async {
       final authEntity =
-          ArtistAuthEntity(email: 'test@example.com', password: '123');
+          AdminAuthEntity(email: 'test@example.com', password: '123');
 
-      final result = await authEntity.loginArtist();
+      final result = await authEntity.loginAdmin();
 
       expect(result.isLeft(), true);
       expect(result.fold((l) => l, (r) => null), isA<LoginFailure>());
     });
 
     test('returns LoginSuccess when email and password are valid', () async {
-      final mockRepo = MockArtistLoginRepository();
-      final artist = ArtistLoginDTO(
-        email: 'test@example.com',
-        password: 'password123',
-      );
-      when(mockRepo.artistLogin(artist)).thenAnswer(
+      final mockRepo = MockAdminLoginRepository();
+      when(mockRepo.adminLogin(any)).thenAnswer(
           (_) async => Right(LoginRequestSuccess(token: 'valid_token')));
-      final authEntity = MockArtistEntity(
+      final authEntity = MockAdminEntity(
           email: 'test@example.com',
           password: 'password123',
           repository: mockRepo);
 
-      final result = await authEntity.loginArtist();
+      final result = await authEntity.loginAdmin();
 
       expect(result.isRight(), true);
       expect(result.fold((l) => null, (r) => r), isA<LoginSuccess>());
