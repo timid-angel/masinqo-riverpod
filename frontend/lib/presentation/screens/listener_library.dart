@@ -1,14 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:masinqo/application/listener/listener_playlist/playlist_bloc.dart';
-import 'package:masinqo/application/listener/listener_playlist/playlist_events.dart';
+import 'package:masinqo/application/listener/listener_playlist/playlist_provider.dart';
 import 'package:masinqo/application/listener/listener_playlist/playlist_state.dart';
 import 'package:masinqo/domain/entities/playlist.dart';
 import 'package:masinqo/presentation/core/theme/app_colors.dart';
 import 'package:masinqo/presentation/widgets/listener_library_playlist.dart';
 
-class ListenerLibrary extends StatelessWidget {
+class ListenerLibrary extends ConsumerWidget {
   const ListenerLibrary({
     super.key,
     // required this.playlists,
@@ -18,8 +17,11 @@ class ListenerLibrary extends StatelessWidget {
   // final List<Playlist> playlists;
 
   @override
-  Widget build(BuildContext context) {
-    BlocProvider.of<PlaylistBloc>(context).add(FetchPlaylists(token: token));
+  Widget build(BuildContext context, WidgetRef ref) {
+    final playlistNotifier = ref.read(playlistProvider.notifier);
+    final playlistState = ref.watch(playlistProvider);
+
+    playlistNotifier.fetchPlaylists(token);
     return SafeArea(
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 2),
@@ -38,8 +40,8 @@ class ListenerLibrary extends StatelessWidget {
                   IconButton(
                     onPressed: () {
                       final arguments = PlaylistNavigationExtras(
-                          token: token,
-                          playlistBloc: BlocProvider.of<PlaylistBloc>(context));
+                        token: token,
+                      );
                       context.pushNamed("listener_new_playlist",
                           extra: arguments);
                     },
@@ -50,43 +52,39 @@ class ListenerLibrary extends StatelessWidget {
               ),
             ),
             Expanded(
-              child: BlocBuilder<PlaylistBloc, PlaylistState>(
-                builder: (context, state) {
-                  if (state is EmptyPlaylist) {
-                    return const Center(child: Text('No playlists available'));
-                  } else if (state is LoadedPlaylist) {
-                    return GridView.count(
-                      crossAxisCount: 2,
-                      mainAxisSpacing: 20,
-                      crossAxisSpacing: 20,
-                      childAspectRatio: 1.2,
-                      children: state.playlists
-                          .map(
-                            (p) => GestureDetector(
-                              onTap: () {
-                                final arguments = PlaylistNavigationArgument(
-                                    token: token,
-                                    playlist: p,
-                                    playlistBloc:
-                                        BlocProvider.of<PlaylistBloc>(context));
-                                context.pushNamed("listener_playlist",
-                                    extra: arguments);
-                              },
-                              child: LibraryPlaylistCard(playlist: p),
+              child: playlistState is EmptyPlaylist
+                  ? const Center(child: Text('No playlists available'))
+                  : playlistState is LoadedPlaylist
+                      ? GridView.count(
+                          crossAxisCount: 2,
+                          mainAxisSpacing: 20,
+                          crossAxisSpacing: 20,
+                          childAspectRatio: 1.2,
+                          children: playlistState.playlists
+                              .map(
+                                (p) => GestureDetector(
+                                  onTap: () {
+                                    final arguments =
+                                        PlaylistNavigationArgument(
+                                      token: token,
+                                      playlist: p,
+                                    );
+                                    context.pushNamed("listener_playlist",
+                                        extra: arguments);
+                                  },
+                                  child: LibraryPlaylistCard(playlist: p),
+                                ),
+                              )
+                              .toList(),
+                        )
+                      : playlistState is ErrorPlaylist
+                          ? Center(
+                              child: Text(
+                                  'Failed to load playlists: ${playlistState.error}'))
+                          : const Center(
+                              child: CircularProgressIndicator(),
                             ),
-                          )
-                          .toList(),
-                    );
-                  } else if (state is ErrorPlaylist) {
-                    return Center(
-                        child:
-                            Text('Failed to load playlists: ${state.error}'));
-                  } else {
-                    return const Center(child: CircularProgressIndicator());
-                  }
-                },
-              ),
-            ),
+            )
           ],
         ),
       ),
@@ -96,18 +94,16 @@ class ListenerLibrary extends StatelessWidget {
 
 class PlaylistNavigationExtras {
   final String token;
-  final PlaylistBloc playlistBloc;
 
-  PlaylistNavigationExtras({required this.token, required this.playlistBloc});
+  PlaylistNavigationExtras({required this.token});
 }
 
 class PlaylistNavigationArgument {
   final String token;
   final Playlist playlist;
-  final PlaylistBloc playlistBloc;
 
-  PlaylistNavigationArgument(
-      {required this.token,
-      required this.playlist,
-      required this.playlistBloc});
+  PlaylistNavigationArgument({
+    required this.token,
+    required this.playlist,
+  });
 }

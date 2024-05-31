@@ -1,7 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:masinqo/application/listener/listener_playlist/playlist_bloc.dart';
-import 'package:masinqo/application/listener/listener_playlist/playlist_events.dart';
 import 'package:masinqo/presentation/core/theme/app_colors.dart';
 import 'package:masinqo/presentation/widgets/modal_button.dart';
 import 'package:masinqo/presentation/widgets/modal_heading.dart';
@@ -64,12 +61,12 @@ class AddPlaylistWidget extends StatelessWidget {
                           text: 'Create Playlist',
                           onPressed: () {
                             if (_formKey.currentState!.validate()) {
-                              BlocProvider.of<PlaylistBloc>(context).add(
-                                CreatePlaylists(
-                                  token: token,
-                                  name: nameController.text,
-                                ),
-                              );
+                              // BlocProvider.of<PlaylistBloc>(context).add(
+                              //   CreatePlaylists(
+                              //     token: token,
+                              //     name: nameController.text,
+                              //   ),
+                              // );
                               ScaffoldMessenger.of(context).showSnackBar(
                                 const SnackBar(
                                   backgroundColor: Colors.green,
