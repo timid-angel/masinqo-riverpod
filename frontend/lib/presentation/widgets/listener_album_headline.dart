@@ -1,12 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:masinqo/application/listener/listener_favorite/favorite_bloc.dart';
-import 'package:masinqo/application/listener/listener_favorite/favorite_events.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:masinqo/application/listener/listener_favorite/favorite_provider.dart';
 import 'package:masinqo/application/listener/listener_favorite/favorite_state.dart';
 import 'package:masinqo/domain/entities/albums.dart';
 import 'package:masinqo/presentation/core/theme/app_colors.dart';
 
-class AlbumHeadlineWidget extends StatefulWidget {
+class AlbumHeadlineWidget extends ConsumerStatefulWidget {
   const AlbumHeadlineWidget({
     super.key,
     required this.album,
@@ -16,10 +15,11 @@ class AlbumHeadlineWidget extends StatefulWidget {
   final Album album;
 
   @override
-  State<AlbumHeadlineWidget> createState() => _AlbumHeadlineWidgetState();
+  ConsumerState<ConsumerStatefulWidget> createState() =>
+      _AlbumHeadlineWidgetState();
 }
 
-class _AlbumHeadlineWidgetState extends State<AlbumHeadlineWidget> {
+class _AlbumHeadlineWidgetState extends ConsumerState<AlbumHeadlineWidget> {
   bool liked = false;
   @override
   void initState() {
@@ -28,7 +28,8 @@ class _AlbumHeadlineWidgetState extends State<AlbumHeadlineWidget> {
   }
 
   void _checkIfFavorite() {
-    final favoriteState = BlocProvider.of<FavoriteBloc>(context).state;
+    final favoriteState = ref.watch(favoriteProvider);
+
     if (favoriteState is LoadedFavorite) {
       setState(() {
         liked = favoriteState.favorites
@@ -39,12 +40,12 @@ class _AlbumHeadlineWidgetState extends State<AlbumHeadlineWidget> {
 
   void _handleFavoriteTap() {
     setState(() {
+      final favoriteNotifier = ref.read(favoriteProvider.notifier);
+
       if (liked) {
-        BlocProvider.of<FavoriteBloc>(context)
-            .add(DeleteFavorite(token: widget.token, id: widget.album.id));
+        favoriteNotifier.deleteFavorite(widget.album.id, widget.token);
       } else {
-        BlocProvider.of<FavoriteBloc>(context)
-            .add(AddFavorite(token: widget.token, id: widget.album.id));
+        favoriteNotifier.addFavorite(widget.album.id, widget.token);
       }
       liked = !liked;
     });

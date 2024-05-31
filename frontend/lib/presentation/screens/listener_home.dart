@@ -1,17 +1,15 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+
 import 'package:go_router/go_router.dart';
-import 'package:masinqo/application/listener/listener_album/album_bloc.dart';
-import 'package:masinqo/application/listener/listener_album/album_events.dart';
+import 'package:masinqo/application/listener/listener_album/album_provider.dart';
 import 'package:masinqo/application/listener/listener_album/album_state.dart';
-import 'package:masinqo/application/listener/listener_favorite/favorite_bloc.dart';
-import 'package:masinqo/application/listener/listener_favorite/favorite_events.dart';
 
 import 'package:masinqo/domain/entities/albums.dart';
 
 import 'package:masinqo/presentation/widgets/listener_home_album.dart';
 
-class ListenerHome extends StatelessWidget {
+class ListenerHome extends ConsumerWidget {
   const ListenerHome({
     super.key,
     required this.token,
@@ -20,9 +18,12 @@ class ListenerHome extends StatelessWidget {
   // final List<Album> albums;
 
   @override
-  Widget build(BuildContext context) {
-    BlocProvider.of<AlbumBloc>(context).add(FetchAlbums());
-    BlocProvider.of<FavoriteBloc>(context).add(FetchFavorites(token: token));
+  Widget build(BuildContext context, WidgetRef ref) {
+    // BlocProvider.of<FavoriteBloc>(context).add(FetchFavorites(token: token));
+    final albumNotifier = ref.read(albumProvider.notifier);
+    final albumState = ref.watch(albumProvider);
+
+    albumNotifier.fetchAlbums();
 
     return SafeArea(
       child: Container(
@@ -38,38 +39,32 @@ class ListenerHome extends StatelessWidget {
               ),
             ),
             Expanded(
-              child: BlocBuilder<AlbumBloc, AlbumState>(
-                builder: (context, state) {
-                  if (state is EmptyAlbum) {
-                    return const Center(child: Text('No Albums available'));
-                  } else if (state is LoadedAlbum) {
-                    return ListView.builder(
-                      physics: const NeverScrollableScrollPhysics(),
-                      itemCount: state.albums.length,
-                      itemBuilder: (context, index) => GestureDetector(
-                        onTap: () {
-                          final arguments = AlbumNavigationArgument(
-                            token: token,
-                            album: state.albums[index],
-                            favoriteBloc:
-                                BlocProvider.of<FavoriteBloc>(context),
-                          );
+              child: albumState is EmptyAlbum
+                  ? const Center(child: Text('No Albums available'))
+                  : albumState is LoadedAlbum
+                      ? ListView.builder(
+                          physics: const NeverScrollableScrollPhysics(),
+                          itemCount: albumState.albums.length,
+                          itemBuilder: (context, index) => GestureDetector(
+                            onTap: () {
+                              final arguments = AlbumNavigationArgument(
+                                token: token,
+                                album: albumState.albums[index],
+                              );
 
-                          context.pushNamed("listener_album", extra: arguments);
-                        },
-                        child: ListenerHomeAlbumCard(
-                          album: state.albums[index],
-                        ),
-                      ),
-                    );
-                  } else if (state is ErrorAlbum) {
-                    return Center(
-                        child: Text('Failed to load Album: ${state.error}'));
-                  } else {
-                    return const Center(child: CircularProgressIndicator());
-                  }
-                },
-              ),
+                              context.pushNamed("listener_album",
+                                  extra: arguments);
+                            },
+                            child: ListenerHomeAlbumCard(
+                              album: albumState.albums[index],
+                            ),
+                          ),
+                        )
+                      : albumState is ErrorAlbum
+                          ? Center(
+                              child: Text(
+                                  'Failed to load Album: ${albumState.error}'))
+                          : const Center(child: CircularProgressIndicator()),
             ),
           ],
         ),
@@ -81,11 +76,9 @@ class ListenerHome extends StatelessWidget {
 class AlbumNavigationArgument {
   final String token;
   final Album album;
-  final FavoriteBloc favoriteBloc;
 
   AlbumNavigationArgument({
     required this.token,
     required this.album,
-    required this.favoriteBloc,
   });
 }
