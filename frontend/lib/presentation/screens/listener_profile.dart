@@ -1,17 +1,20 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:masinqo/application/listener/listener_profile/profile_provider.dart';
+import 'package:masinqo/application/listener/listener_profile/profile_state.dart';
 import 'package:masinqo/presentation/core/theme/app_colors.dart';
 import 'package:masinqo/presentation/widgets/profile_mgmt_section_title.dart';
 
-class ListenerProfile extends StatefulWidget {
+class ListenerProfile extends ConsumerStatefulWidget {
   final String token;
 
   const ListenerProfile({super.key, required this.token});
 
   @override
-  ListenerProfileState createState() => ListenerProfileState();
+  ConsumerState<ConsumerStatefulWidget> createState() => ListenerProfileState();
 }
 
-class ListenerProfileState extends State<ListenerProfile> {
+class ListenerProfileState extends ConsumerState<ListenerProfile> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
   final TextEditingController _usernameController = TextEditingController();
@@ -21,7 +24,16 @@ class ListenerProfileState extends State<ListenerProfile> {
       TextEditingController();
 
   @override
+  void initState() {
+    super.initState();
+    ref.read(profileProvider.notifier).fetchProfile(widget.token);
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final profileNotifier = ref.read(profileProvider.notifier);
+    final profileState = ref.watch(profileProvider);
+
     return Scaffold(
       key: _scaffoldKey,
       appBar: AppBar(
@@ -36,17 +48,29 @@ class ListenerProfileState extends State<ListenerProfile> {
             children: [
               profilePicture(),
               const SizedBox(height: 5),
-              const Text(
-                'Username',
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  color: Color.fromARGB(255, 238, 197, 255),
-                  fontSize: 32,
-                  fontWeight: FontWeight.bold,
-                ),
-                overflow: TextOverflow.ellipsis,
-                maxLines: 1,
-              ),
+              profileState is LoadedProfile
+                  ? Text(
+                      profileState.profile.name,
+                      textAlign: TextAlign.center,
+                      style: const TextStyle(
+                        color: Color.fromARGB(255, 238, 197, 255),
+                        fontSize: 32,
+                        fontWeight: FontWeight.bold,
+                      ),
+                      overflow: TextOverflow.ellipsis,
+                      maxLines: 1,
+                    )
+                  : const Text(
+                      'Username',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        color: Color.fromARGB(255, 238, 197, 255),
+                        fontSize: 32,
+                        fontWeight: FontWeight.bold,
+                      ),
+                      overflow: TextOverflow.ellipsis,
+                      maxLines: 1,
+                    ),
               const SizedBox(height: 20),
               const SectionTitle(title: 'Change Username'),
               RoundedInputField(
@@ -72,13 +96,28 @@ class ListenerProfileState extends State<ListenerProfile> {
               const SizedBox(height: 10),
               ElevatedButton(
                 onPressed: () {
-                  // context.read<ProfileBloc>().add(
-                  //       EditProfile(
-                  //           token: widget.token,
-                  //           name: _usernameController.text,
-                  //           email: _emailController.text,
-                  //           password: _passwordController.text),
-                  //     );
+                  final username = _usernameController.text;
+                  final email = _emailController.text;
+                  final password = _passwordController.text;
+
+                  profileNotifier.editProfile(
+                    widget.token,
+                    username,
+                    email,
+                    password,
+                  );
+                  ref.read(profileProvider.notifier).fetchProfile(widget.token);
+                  _usernameController.clear();
+                  _emailController.clear();
+                  _passwordController.clear();
+                  _confirmPasswordController.clear();
+
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      backgroundColor: Colors.green,
+                      content: Text('Profile Updated'),
+                    ),
+                  );
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: AppColors.listener2,
@@ -145,6 +184,7 @@ class RoundedInputField extends StatelessWidget {
         border: Border.all(color: AppColors.listener2, width: 1),
       ),
       child: TextField(
+        controller: controller,
         style: const TextStyle(color: Colors.grey),
         decoration: InputDecoration(
           hintText: placeholder,

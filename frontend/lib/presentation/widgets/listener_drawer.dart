@@ -1,14 +1,20 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:masinqo/application/listener/listener_profile/profile_provider.dart';
+import 'package:masinqo/application/listener/listener_profile/profile_state.dart';
 
-class ListenerDrawer extends StatelessWidget {
+class ListenerDrawer extends ConsumerWidget {
   final String token;
 
   const ListenerDrawer({super.key, required this.token});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    ref.read(profileProvider.notifier).fetchProfile(token);
+    final ProfileState profileState = ref.watch(profileProvider);
     // context.read<ProfileBloc>().add(FetchProfile(token: token));
+
     return Drawer(
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 15),
@@ -30,14 +36,25 @@ class ListenerDrawer extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 5),
-                  const Text(
-                    "Username",
-                    maxLines: 1,
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 19,
-                    ),
-                  ),
+                  profileState is LoadedProfile
+                      ? Text(
+                          profileState.profile.name,
+                          textAlign: TextAlign.center,
+                          style: const TextStyle(
+                            color: Color.fromARGB(255, 238, 197, 255),
+                            fontSize: 21,
+                            fontWeight: FontWeight.bold,
+                          ),
+                          overflow: TextOverflow.ellipsis,
+                        )
+                      : const Text(
+                          "Username",
+                          maxLines: 1,
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 19,
+                          ),
+                        ),
                 ],
               ),
             ),
