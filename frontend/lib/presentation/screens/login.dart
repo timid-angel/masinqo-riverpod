@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:masinqo/application/auth/auth_providers.dart';
+import 'package:masinqo/application/auth/login/auth_providers.dart';
 import 'package:masinqo/presentation/core/theme/app_colors.dart';
 import 'package:masinqo/presentation/widgets/main_login_textfield.dart';
 import 'package:masinqo/presentation/widgets/background.dart';

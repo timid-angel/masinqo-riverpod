@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:masinqo/application/admin/admin_providers.dart';
-import 'package:masinqo/application/auth/auth_providers.dart';
+import 'package:masinqo/application/auth/login/auth_providers.dart';
 import 'package:masinqo/domain/admin/admin_listeners/admin_listeners.dart';
 import 'package:masinqo/presentation/widgets/admin_header.dart';
 import 'delete_confirmation_modal.dart';

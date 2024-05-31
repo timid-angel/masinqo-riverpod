@@ -8,10 +8,9 @@ import 'package:masinqo/infrastructure/auth/signup_failure.dart';
 import 'package:masinqo/infrastructure/auth/signup_success.dart';
 
 class ArtistSignupRepository implements ArtistSignupRepositoryInterface {
-  final ArtistSignupDataSource dataSource;
+  final ArtistSignupDataSource dataSource = ArtistSignupDataSource();
 
-  ArtistSignupRepository({required this.dataSource});
-
+  ArtistSignupRepository();
   @override
   Future<Either<SignupRequestFailure, SignupRequestSuccess>> signupArtist(
       ArtistSignupDTO artist) async {

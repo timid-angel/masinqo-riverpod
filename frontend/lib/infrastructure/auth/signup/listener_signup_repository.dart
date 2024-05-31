@@ -8,9 +8,8 @@ import 'package:masinqo/infrastructure/auth/signup_failure.dart';
 import 'package:masinqo/infrastructure/auth/signup_success.dart';
 
 class ListenerSignupRepository implements ListenerSignupRepositoryInterface {
-  final ListenerSignupDataSource dataSource;
-
-  ListenerSignupRepository({required this.dataSource});
+  final ListenerSignupDataSource dataSource = ListenerSignupDataSource();
+  ListenerSignupRepository();
 
   @override
   Future<Either<SignupRequestFailure, SignupRequestSuccess>> signupListener(

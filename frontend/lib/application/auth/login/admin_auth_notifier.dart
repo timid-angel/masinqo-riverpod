@@ -1,5 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:masinqo/application/auth/auth_state.dart';
+import 'package:masinqo/application/auth/login/auth_state.dart';
 import 'package:masinqo/domain/auth/interfaces/admin_login_repository_interface.dart';
 import 'package:masinqo/domain/auth/login/login_entities.dart';
 

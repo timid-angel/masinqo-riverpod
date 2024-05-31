@@ -1,17 +1,15 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-// import 'package:go_router/go_router.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:masinqo/application/auth/signup/signup_providers.dart';
+import 'package:go_router/go_router.dart';
+import 'package:masinqo/application/auth/signup/signup_states.dart';
 import '../widgets/login_brand.dart';
 import '../core/theme/app_colors.dart';
 import '../widgets/signup_textfield.dart';
-import 'package:masinqo/application/auth/signup/artist_signup/artist_signup_bloc.dart';
-import 'package:masinqo/application/auth/signup/artist_signup/artist_signup_event.dart';
 import 'package:masinqo/infrastructure/auth/signup/artist_signup_dto.dart';
-import 'package:masinqo/application/auth/signup/listener_signup/listener_signup_bloc.dart';
-import 'package:masinqo/application/auth/signup/listener_signup/listener_signup_event.dart';
 import 'package:masinqo/infrastructure/auth/signup/listener_signup_dto.dart';
 
-class SignupWidget extends StatelessWidget {
+class SignupWidget extends ConsumerWidget {
   final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
@@ -21,7 +19,7 @@ class SignupWidget extends StatelessWidget {
 
   SignupWidget({super.key});
 
-  void Function()? signupHandler(BuildContext context) {
+  void Function()? signupHandler(WidgetRef ref) {
     void signupH() {
       if (_isArtist.value) {
         final artistDto = ArtistSignupDTO(
@@ -30,13 +28,8 @@ class SignupWidget extends StatelessWidget {
           password: _passwordController.text,
           confirmPassword: _confirmPasswordController.text,
         );
-        final confirmPassword = _confirmPasswordController.text;
-        final artist = artistDto.toArtist();
 
-        BlocProvider.of<ArtistSignupBloc>(context).add(ArtistSignupEvent(
-          artist: artist,
-          confirmPassword: confirmPassword,
-        ));
+        ref.read(artistSignupProvider.notifier).artistSignup(artistDto);
       } else {
         final listenerDto = ListenerSignupDTO(
           name: _usernameController.text,
@@ -44,41 +37,58 @@ class SignupWidget extends StatelessWidget {
           password: _passwordController.text,
           confirmPassword: _confirmPasswordController.text,
         );
-        final confirmPassword = _confirmPasswordController.text;
-        final listener = listenerDto.toListener();
 
-        BlocProvider.of<ListenerSignupBloc>(context).add(ListenerSignupEvent(
-          listener: listener,
-          confirmPassword: confirmPassword,
-        ));
+        ref.read(listenerSignupProvider.notifier).listenerSignup(listenerDto);
       }
     }
 
     return signupH;
   }
 
-  // if (state is ArtistSignupSuccess) {
-  //             ScaffoldMessenger.of(context).showSnackBar(
-  //               const SnackBar(
-  //                 content: Text("Account created succesfully!"),
-  //                 backgroundColor: Color.fromARGB(255, 73, 158, 27),
-  //               ),
-  //             );
-  //             Future.delayed(const Duration(milliseconds: 1500))
-  //                 .then((d) => context.go("/login"));
-  //           } else if (state is ArtistSignupFailure) {
-  //             ScaffoldMessenger.of(context).showSnackBar(
-  //               SnackBar(
-  //                 content: Text(state.error),
-  //                 backgroundColor: const Color.fromARGB(255, 212, 47, 47),
-  //               ),
-  //             );
-  //             BlocProvider.of<ArtistSignupBloc>(context).add(AResetState());
-  //           }
-
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     double deviceHeight = MediaQuery.of(context).size.height;
+    ref.listen(artistSignupProvider, (prev, nxt) {
+      if (nxt is ArtistSignupSuccess) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text("Account created succesfully!"),
+            backgroundColor: Color.fromARGB(255, 73, 158, 27),
+          ),
+        );
+        Future.delayed(const Duration(milliseconds: 1500))
+            .then((d) => context.go("/login"));
+      } else if (nxt is ArtistSignupFailure) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(nxt.error),
+            backgroundColor: const Color.fromARGB(255, 212, 47, 47),
+          ),
+        );
+        ref.read(artistSignupProvider.notifier).resetState();
+      }
+    });
+
+    ref.listen(listenerSignupProvider, (prev, nxt) {
+      if (nxt is ListenerSignupSuccess) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text("Account created succesfully!"),
+            backgroundColor: Color.fromARGB(255, 73, 158, 27),
+          ),
+        );
+        Future.delayed(const Duration(milliseconds: 1500))
+            .then((d) => context.go("/login"));
+      } else if (nxt is ListenerSignupFailure) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(nxt.error),
+            backgroundColor: const Color.fromARGB(255, 212, 47, 47),
+          ),
+        );
+        ref.read(listenerSignupProvider.notifier).resetState();
+      }
+    });
     return Scaffold(
       backgroundColor: AppColors.black,
       extendBodyBehindAppBar: true,
@@ -247,7 +257,7 @@ class SignupWidget extends StatelessWidget {
                             ),
                             const SizedBox(height: 20),
                             ElevatedButton(
-                              onPressed: signupHandler(context),
+                              onPressed: signupHandler(ref),
                               style: ButtonStyle(
                                 backgroundColor: WidgetStateProperty.all<Color>(
                                   isArtist

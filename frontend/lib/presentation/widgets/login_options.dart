@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:masinqo/application/auth/auth_providers.dart';
+import 'package:masinqo/application/auth/login/auth_providers.dart';
 
 class LoginOptionButton extends ConsumerWidget {
   final bool isArtist;
