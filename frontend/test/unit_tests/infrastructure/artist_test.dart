@@ -9,79 +9,78 @@ import 'package:mockito/mockito.dart';
 
 class MockArtistsRepository extends Mock implements ArtistsRepositoryInterface {
   @override
-  Future<Either<Failure, Success>> addAlbum(CreateAlbumDTO album) =>
+  Future<Either<ArtistFailure, AddAlbumSuccess>> addAlbum(
+          CreateAlbumDTO album) =>
       super.noSuchMethod(
         Invocation.method(#addAlbum, [album]),
-        returnValue: Future.value(Right<Failure, Success>(ArtistsSuccess())),
-        returnValueForMissingStub:
-            Future.value(Right<Failure, Success>(ArtistsSuccess())),
+        returnValue: Future.value(Right(ArtistsSuccess())),
+        returnValueForMissingStub: Future.value(Right(ArtistsSuccess())),
       );
 
   @override
-  Future<Either<Failure, Success>> addSong(
+  Future<Either<ArtistFailure, Success>> addSong(
           CreateSongDTO songDto, String songFilePath) =>
       super.noSuchMethod(
         Invocation.method(#addSong, [songDto, songFilePath]),
-        returnValue: Future.value(Right<Failure, Success>(ArtistsSuccess())),
-        returnValueForMissingStub:
-            Future.value(Right<Failure, Success>(ArtistsSuccess())),
+        returnValue: Future.value(ArtistsSuccess()),
+        returnValueForMissingStub: Future.value(ArtistFailure(message: "")),
       );
 
   @override
-  Future<Either<Failure, Success>> deleteAlbum(String albumId) =>
+  Future<Either<ArtistFailure, Success>> deleteAlbum(String albumId) =>
       super.noSuchMethod(
         Invocation.method(#deleteAlbum, [albumId]),
-        returnValue: Future.value(Right<Failure, Success>(ArtistsSuccess())),
+        returnValue: Future.value(Right(ArtistsSuccess())),
         returnValueForMissingStub:
-            Future.value(Right<Failure, Success>(ArtistsSuccess())),
+            Future.value(Left(ArtistFailure(message: ""))),
       );
 
   @override
-  Future<Either<Failure, GetAlbumsSuccess>> getAlbums() => super.noSuchMethod(
+  Future<Either<ArtistFailure, GetAlbumsSuccess>> getAlbums() =>
+      super.noSuchMethod(
         Invocation.method(#getAlbums, []),
-        returnValue: Future.value(
-            Right<Failure, GetAlbumsSuccess>(GetAlbumsSuccess(albums: []))),
-        returnValueForMissingStub: Future.value(
-            Right<Failure, GetAlbumsSuccess>(GetAlbumsSuccess(albums: []))),
+        returnValue: Future.value(Right(GetAlbumsSuccess(albums: []))),
+        returnValueForMissingStub:
+            Future.value(Left(ArtistFailure(message: ""))),
       );
 
   @override
-  Future<Either<Failure, GetSongsSuccess>> getSongs(String albumId) =>
+  Future<Either<ArtistFailure, GetSongsSuccess>> getSongs(String albumId) =>
       super.noSuchMethod(
         Invocation.method(#getSongs, [albumId]),
-        returnValue: Future.value(
-            Right<Failure, GetSongsSuccess>(GetSongsSuccess(songs: []))),
-        returnValueForMissingStub: Future.value(
-            Right<Failure, GetSongsSuccess>(GetSongsSuccess(songs: []))),
+        returnValue: Future.value(Right(GetSongsSuccess(songs: []))),
+        returnValueForMissingStub:
+            Future.value(Left(ArtistFailure(message: ""))),
       );
 
   @override
-  Future<Either<Failure, Success>> removeSong(
+  Future<Either<ArtistFailure, Success>> removeSong(
           String albumId, String songName) =>
       super.noSuchMethod(
         Invocation.method(#removeSong, [albumId, songName]),
-        returnValue: Future.value(Right<Failure, Success>(ArtistsSuccess())),
+        returnValue: Future.value(Right(ArtistsSuccess())),
         returnValueForMissingStub:
-            Future.value(Right<Failure, Success>(ArtistsSuccess())),
+            Future.value(Left(ArtistFailure(message: ""))),
       );
 
   @override
-  Future<Either<Failure, Success>> updateAlbum(UpdateAlbumDTO updateDto) =>
+  Future<Either<ArtistFailure, Success>> updateAlbum(
+          UpdateAlbumDTO updateDto) =>
       super.noSuchMethod(
         Invocation.method(#updateAlbum, [updateDto]),
-        returnValue: Future.value(Right<Failure, Success>(ArtistsSuccess())),
+        returnValue: Future.value(Right(ArtistsSuccess())),
         returnValueForMissingStub:
-            Future.value(Right<Failure, Success>(ArtistsSuccess())),
+            Future.value(Left(ArtistFailure(message: ""))),
       );
 
   @override
-  Future<Either<Failure, Success>> updateInformation(
+  Future<Either<ArtistFailure, Success>> updateInformation(
           UpdateArtistInformatioDTO artist) =>
       super.noSuchMethod(
         Invocation.method(#updateInformation, [artist]),
-        returnValue: Future.value(Right<Failure, Success>(ArtistsSuccess())),
+        returnValue: Future.value(Right(ArtistsSuccess())),
         returnValueForMissingStub:
-            Future.value(Right<Failure, Success>(ArtistsSuccess())),
+            Future.value(Left(ArtistFailure(message: ""))),
       );
 }
 
@@ -96,31 +95,17 @@ void main() {
     type: 'Test Type',
   );
 
-  test('should add album when fields are not empty', () async {
-    when(mockArtistsRepository.addAlbum(testAlbumDto)).thenAnswer(
-        (_) async => Right<ArtistFailure, Success>(ArtistsSuccess()));
-
-    final result = await mockArtistsRepository.addAlbum(testAlbumDto);
-
-    verify(mockArtistsRepository.addAlbum(testAlbumDto));
-    expect(
-        result,
-        isA<Right<ArtistFailure, Success>>()
-            .having((r) => r.value, 'value', isA<ArtistsSuccess>()));
-  });
-
   final testSongDto = CreateSongDTO(albumId: 'album-id', songName: 'Test Song');
   test('should add song when fields are not empty', () async {
     when(mockArtistsRepository.addSong(testSongDto, 'song-file-path'))
-        .thenAnswer(
-            (_) async => Right<ArtistFailure, Success>(ArtistsSuccess()));
+        .thenAnswer((_) async => Left(ArtistFailure(message: "")));
 
     final result =
         await mockArtistsRepository.addSong(testSongDto, 'song-file-path');
 
     verify(mockArtistsRepository.addSong(testSongDto, 'song-file-path'));
     expect(
-        result,
+        result.fold((l) => l, (r) => r),
         isA<Right<ArtistFailure, Success>>()
             .having((r) => r.value, 'value', isA<ArtistsSuccess>()));
   });

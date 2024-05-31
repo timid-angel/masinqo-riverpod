@@ -1,20 +1,24 @@
+import 'package:masinqo/domain/artists/artists_repository_interface.dart';
+import 'package:masinqo/infrastructure/artists/artists_repository.dart';
 import 'package:test/test.dart';
 import 'package:dartz/dartz.dart';
 import 'package:mockito/mockito.dart';
 import 'package:masinqo/domain/artists/artists.dart';
 import 'package:masinqo/domain/artists/artists_success.dart';
 import 'package:masinqo/domain/artists/artists_failure.dart';
-import 'package:masinqo/infrastructure/artists/artists_repository.dart';
 import 'package:masinqo/infrastructure/artists/artists_dto.dart';
 
-class MockArtistsRepository extends Mock implements ArtistsRepository {}
+class MockArtistsRepository extends Mock
+    implements ArtistsRepositoryInterface {}
 
 void main() {
   group('addAlbum', () {
-    ArtistEntity artistEntity = ArtistEntity(token: 'valid_token');
+    ArtistEntity artistEntity =
+        ArtistEntity(artistRepo: ArtistsRepository(token: "1"));
 
     test('Should return failure when token is empty', () async {
-      final artistEntityWithInvalidToken = ArtistEntity(token: '');
+      final artistEntityWithInvalidToken =
+          ArtistEntity(artistRepo: ArtistsRepository(token: ""));
       final result = await artistEntityWithInvalidToken.addAlbum(CreateAlbumDTO(
         title: 'Test Title',
         albumArt: 'Test Album Art',
@@ -36,7 +40,7 @@ void main() {
           albumArt: 'path/to/art.jpg',
           genre: 'Pop'));
       expect(
-        result.fold((l) => l.message, (r) => null),
+        result.fold((l) => l.message, (r) => r.toString()),
         equals('Title too short'),
       );
     });

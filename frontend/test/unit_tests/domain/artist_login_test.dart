@@ -32,8 +32,10 @@ class MockArtistEntity extends Mock implements ArtistAuthEntity {
 void main() {
   group('ArtistAuthEntity', () {
     test('returns LoginFailure when email is invalid', () async {
-      final authEntity =
-          ArtistAuthEntity(email: 'invalid', password: 'password123');
+      final authEntity = ArtistAuthEntity(
+          email: 'invalid',
+          password: 'password123',
+          artistLoginRepo: MockArtistLoginRepository());
 
       final result = await authEntity.loginArtist();
 
@@ -42,8 +44,10 @@ void main() {
     });
 
     test('returns LoginFailure when password is too short', () async {
-      final authEntity =
-          ArtistAuthEntity(email: 'test@example.com', password: '123');
+      final authEntity = ArtistAuthEntity(
+          email: 'test@example.com',
+          password: '123',
+          artistLoginRepo: MockArtistLoginRepository());
 
       final result = await authEntity.loginArtist();
 

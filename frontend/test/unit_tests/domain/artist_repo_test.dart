@@ -1,20 +1,22 @@
+import 'package:masinqo/infrastructure/artists/artists_repository.dart';
+import 'package:mockito/mockito.dart';
 import 'package:test/test.dart';
 import 'package:dartz/dartz.dart';
-import 'package:mockito/mockito.dart';
 import 'package:masinqo/domain/artists/artists.dart';
 import 'package:masinqo/domain/artists/artists_success.dart';
 import 'package:masinqo/domain/artists/artists_failure.dart';
-import 'package:masinqo/infrastructure/artists/artists_repository.dart';
 import 'package:masinqo/infrastructure/artists/artists_dto.dart';
 
 class MockArtistsRepository extends Mock implements ArtistsRepository {}
 
 void main() {
   group('addAlbum', () {
-    ArtistEntity artistEntity = ArtistEntity(token: 'valid_token');
+    ArtistEntity artistEntity =
+        ArtistEntity(artistRepo: ArtistsRepository(token: "1"));
 
     test('Should return failure when token is empty', () async {
-      final artistEntityWithInvalidToken = ArtistEntity(token: '');
+      final artistEntityWithInvalidToken =
+          ArtistEntity(artistRepo: ArtistsRepository(token: ""));
       final result = await artistEntityWithInvalidToken.addAlbum(CreateAlbumDTO(
         title: 'Test Title',
         albumArt: 'Test Album Art',
@@ -22,23 +24,22 @@ void main() {
         description: 'Test Description',
         type: 'Test Type',
       ));
+
       expect(
         result.fold((l) => l.message, (r) => null),
         equals('Invalid token'),
       );
     });
 
-    test('Should return failure when album title is empty', () async {
+    test('Should return failure', () async {
       final result = await artistEntity.addAlbum(CreateAlbumDTO(
           title: '',
           type: 'Album',
           description: 'Test Description',
           albumArt: 'path/to/art.jpg',
           genre: 'Pop'));
-      expect(
-        result.fold((l) => l.message, (r) => null),
-        equals('Title too short'),
-      );
+      expect(result.fold((l) => l.message, (r) => null),
+          equals("Title too short"));
     });
 
     test('Should return failure when album art is missing', () async {
@@ -49,10 +50,8 @@ void main() {
           albumArt: '',
           genre: 'Pop'));
 
-      expect(
-        result.fold((l) => l.message, (r) => null),
-        equals('Album must have an image'),
-      );
+      expect(result.fold((l) => l.message, (r) => null).toString(),
+          equals("Album must have an image"));
     });
     test('Should return failure when genre is empty', () async {
       final result = await artistEntity.addAlbum(CreateAlbumDTO(

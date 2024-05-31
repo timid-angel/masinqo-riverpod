@@ -24,12 +24,10 @@ void main() {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
   late MockAdminArtistsDataSource mockDataSource;
   late MockAdminArtistsRepository mockRepository;
-  late ArtistBloc artistBloc;
 
   setUp(() {
     mockDataSource = MockAdminArtistsDataSource();
     mockRepository = MockAdminArtistsRepository();
-    artistBloc = ArtistBloc(mockRepository as String);
   });
 
   group('Admin Artists Integration Test', () {
