@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:masinqo/presentation/core/theme/app_colors.dart';
 
 import 'package:masinqo/presentation/widgets/listener_album_albumart.dart';
@@ -9,7 +10,7 @@ import 'package:masinqo/presentation/widgets/listener_drawer.dart';
 import '../../domain/entities/albums.dart';
 import '../../temp/audio_manager/listener_audio_manager.dart';
 
-class AlbumWidget extends StatefulWidget {
+class AlbumWidget extends ConsumerStatefulWidget {
   final Album album;
   final String token;
 
@@ -20,10 +21,10 @@ class AlbumWidget extends StatefulWidget {
   });
 
   @override
-  State<AlbumWidget> createState() => _AlbumWidgetState();
+  ConsumerState<ConsumerStatefulWidget> createState() => _AlbumWidgetState();
 }
 
-class _AlbumWidgetState extends State<AlbumWidget> {
+class _AlbumWidgetState extends ConsumerState<AlbumWidget> {
   late AudioManager audioManager;
 
   @override
@@ -73,6 +74,7 @@ class _AlbumWidgetState extends State<AlbumWidget> {
                             album: widget.album, token: widget.token),
                         const Divider(height: 30, thickness: 2),
                         AlbumTracksWidget(
+                            token: widget.token,
                             album: widget.album,
                             onAdd: () {},
                             audioManager: audioManager),

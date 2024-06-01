@@ -66,7 +66,7 @@ class PlaylistWidget extends StatelessWidget {
                         const Divider(height: 30, thickness: 2),
                         PlaylistTracksWidget(
                           playlist: playlist,
-                          onDelete: () {},
+                          token: token,
                           audioManager: audioManager,
                         ),
                       ],

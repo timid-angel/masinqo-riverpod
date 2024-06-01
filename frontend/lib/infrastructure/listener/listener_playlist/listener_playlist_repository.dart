@@ -26,6 +26,20 @@ class ListenerPlaylistRepository implements PlaylistRepository {
   Future<void> deletePlaylist(String id, String token) async {
     await listenerPlaylistService.deletePlaylist(id, token);
   }
+
+  @override
+  Future<void> addSongToPlaylist(String id, String albumId, String token,
+      int index, String name, String filePath) async {
+    await listenerPlaylistService.addSongToPlaylist(
+        id, albumId, token, index, name, filePath);
+  }
+
+  @override
+  Future<void> deleteSongFromPlaylist(String id, String albumId, String token,
+      int index, String name, String filePath) async {
+    await listenerPlaylistService.deleteSongFromPlaylist(
+        id, albumId, token, index, name, filePath);
+  }
 }
 
 // void main() async {

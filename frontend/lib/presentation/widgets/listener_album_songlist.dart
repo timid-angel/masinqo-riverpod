@@ -11,11 +11,14 @@ class AlbumTracksWidget extends StatelessWidget {
     required this.album,
     required this.onAdd,
     required this.audioManager,
+    required this.token,
   });
 
   final Album album;
   final Function() onAdd;
   final AudioManager audioManager;
+
+  final String token;
 
   @override
   Widget build(BuildContext context) {
@@ -33,7 +36,15 @@ class AlbumTracksWidget extends StatelessWidget {
           itemBuilder: (context, idx) {
             Song song = album.songs[idx];
             return AlbumSongTileWidget(
-                song: song, onAdd: onAdd, audioManager: audioManager);
+              song: song,
+              onAdd: onAdd,
+              audioManager: audioManager,
+              index: idx,
+              albumId: album.id,
+              token: token,
+              name: song.name,
+              filePath: song.filePath,
+            );
           },
         ),
       ],

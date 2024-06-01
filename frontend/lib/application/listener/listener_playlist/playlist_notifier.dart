@@ -56,6 +56,30 @@ class PlaylistNotifier extends StateNotifier<PlaylistState> {
     }
   }
 
+  Future<void> addSongToPlaylist(String id, String albumId, String token,
+      int index, String name, String filePath) async {
+    try {
+      await playlistRepository.addSongToPlaylist(
+          id, albumId, token, index, name, filePath);
+      final playlists = await playlistRepository.getPlaylists(token);
+      state = LoadedPlaylist(playlists);
+    } catch (e) {
+      state = ErrorPlaylist(e.toString());
+    }
+  }
+
+  Future<void> deleteSongFromPlaylist(String id, String albumId, String token,
+      int index, String name, String filePath) async {
+    try {
+      await playlistRepository.deleteSongFromPlaylist(
+          id, albumId, token, index, name, filePath);
+      final playlists = await playlistRepository.getPlaylists(token);
+      state = LoadedPlaylist(playlists);
+    } catch (e) {
+      state = ErrorPlaylist(e.toString());
+    }
+  }
+
   Future<void> deletePlaylists(String id, String token) async {
     try {
       await playlistRepository.deletePlaylist(id, token);

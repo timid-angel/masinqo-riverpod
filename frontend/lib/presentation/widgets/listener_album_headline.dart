@@ -21,9 +21,10 @@ class AlbumHeadlineWidget extends ConsumerStatefulWidget {
 
 class _AlbumHeadlineWidgetState extends ConsumerState<AlbumHeadlineWidget> {
   bool liked = false;
+
   @override
-  void initState() {
-    super.initState();
+  void didChangeDependencies() {
+    super.didChangeDependencies();
     _checkIfFavorite();
   }
 
